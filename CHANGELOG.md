@@ -5,6 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.27.0] - 2025-11-01
+
+### Added
+- **Barrel ladder detection** (issue #24)
+  - Barrels can now randomly fall down ladders
+  - 40% chance (BARREL_LADDER_FALL_CHANCE constant) for barrel to take ladder
+  - Barrels detect ladder collision while rolling
+  - Barrels fall at BARREL_FALL_SPEED while on ladder
+  - Barrels resume rolling after exiting ladder at bottom
+  - Added isOnLadder and currentLadder state tracking to Barrel class
+  - handleLadderCollisions() method for ladder detection logic
+
+### Changed
+- Barrel.update() now accepts ladders parameter
+- GameState passes ladders to barrel updates
+- Barrels skip platform collision detection while on ladder
+- Barrels skip gravity application while on ladder
+
 ## [0.26.0] - 2025-11-01
 
 ### Added
