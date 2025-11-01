@@ -5,6 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.28.0] - 2025-11-01
+
+### Added
+- **DonkeyKong animation state machine** (issue #29)
+  - Proper animation state machine with 'idle' and 'throw' states
+  - Animation FPS increased from 4 to 10 (within 8-12 FPS requirement)
+  - Throw animation automatically triggers when barrel spawns
+  - Smooth transition back to idle after throw animation completes (0.5s duration)
+  - Animation frames reset on state transitions for smooth animations
+
+### Changed
+- DK_ANIMATION_FPS constant updated from 4 to 10
+- DonkeyKong.update() uses switch statement for cleaner state management
+- DonkeyKong.render() uses animationState instead of isThrowing flag
+- Removed isThrowing boolean in favor of animationState string
+
 ## [0.27.0] - 2025-11-01
 
 ### Added
