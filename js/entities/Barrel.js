@@ -26,6 +26,8 @@ class Barrel {
         this.isRolling = true;
         this.direction = 1; // 1 = right, -1 = left
         this.isAlive = true;
+        this.isOnLadder = false; // Issue #24: Barrel ladder detection
+        this.currentLadder = null; // Track which ladder barrel is on
 
         // Physics object for compatibility with Physics class
         this.position = { x: this.x, y: this.y };
@@ -61,12 +63,20 @@ class Barrel {
      * Update barrel state
      * @param {number} deltaTime - Time elapsed since last frame in seconds
      * @param {Array<Platform>} platforms - Array of platform objects
+     * @param {Array<Ladder>} ladders - Array of ladder objects (issue #24)
      */
-    update(deltaTime, platforms) {
+    update(deltaTime, platforms, ladders = []) {
         if (!this.isAlive) return;
 
-        // Apply gravity when not on platform
-        Physics.applyGravity(this, deltaTime);
+        // Handle ladder collisions (issue #24)
+        if (ladders && ladders.length > 0) {
+            this.handleLadderCollisions(ladders);
+        }
+
+        // Apply gravity when not on platform and not on ladder
+        if (!this.isOnLadder) {
+            Physics.applyGravity(this, deltaTime);
+        }
 
         // Update rotation based on horizontal velocity
         this.rotation += (this.velocity.x / 20) * deltaTime;
@@ -78,8 +88,10 @@ class Barrel {
         this.x = this.position.x;
         this.y = this.position.y;
 
-        // Handle platform collisions
-        this.handlePlatformCollisions(platforms);
+        // Handle platform collisions (not when falling on ladder)
+        if (!this.isOnLadder) {
+            this.handlePlatformCollisions(platforms);
+        }
 
         // Remove if off-screen
         if (this.x < -this.width || this.x > Constants.CANVAS_WIDTH + this.width ||
@@ -137,6 +149,66 @@ class Barrel {
         // Continue rolling if on platform
         if (onPlatform && this.isRolling) {
             this.velocity.x = Constants.BARREL_ROLL_SPEED * this.direction;
+        }
+    }
+
+    /**
+     * Handle collisions with ladders (issue #24)
+     * Barrels can randomly fall down ladders
+     * @param {Array<Ladder>} ladders - Array of ladder objects
+     */
+    handleLadderCollisions(ladders) {
+        if (!ladders || ladders.length === 0) return;
+
+        const barrelCenterX = this.x + this.width / 2;
+        const barrelBottom = this.y + this.height;
+
+        // If already on ladder, check if we've reached the bottom
+        if (this.isOnLadder && this.currentLadder) {
+            const ladderBottom = this.currentLadder.y + this.currentLadder.height;
+
+            // Check if barrel has reached bottom of ladder
+            if (barrelBottom >= ladderBottom) {
+                // Exit ladder state and resume rolling
+                this.isOnLadder = false;
+                this.currentLadder = null;
+                this.velocity.x = Constants.BARREL_ROLL_SPEED * this.direction;
+                this.velocity.y = 0;
+                this.isRolling = true;
+            } else {
+                // Continue falling on ladder
+                this.velocity.x = 0;
+                this.velocity.y = Constants.BARREL_FALL_SPEED;
+            }
+            return;
+        }
+
+        // Check if barrel is rolling and overlapping with any ladder
+        if (!this.isRolling || this.isOnLadder) return;
+
+        for (const ladder of ladders) {
+            const ladderCenterX = ladder.x + ladder.width / 2;
+            const horizontalDistance = Math.abs(barrelCenterX - ladderCenterX);
+
+            // Check if barrel center is within ladder bounds horizontally
+            if (horizontalDistance < ladder.width / 2) {
+                // Check if barrel is at or near the top of the ladder
+                const ladderTop = ladder.y;
+                const atLadderTop = barrelBottom >= ladderTop - 5 && barrelBottom <= ladderTop + 20;
+
+                if (atLadderTop) {
+                    // Random chance to fall down ladder (issue #24)
+                    if (Math.random() < Constants.BARREL_LADDER_FALL_CHANCE) {
+                        // Start falling on ladder
+                        this.isOnLadder = true;
+                        this.currentLadder = ladder;
+                        this.velocity.x = 0;
+                        this.velocity.y = Constants.BARREL_FALL_SPEED;
+                        this.isRolling = false;
+                    }
+                    break; // Only check one ladder at a time
+                }
+            }
         }
     }
 
