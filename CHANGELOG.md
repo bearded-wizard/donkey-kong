@@ -5,6 +5,29 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.5.0] - 2025-11-01
+
+### Added
+- InputHandler class in `js/systems/InputHandler.js` for comprehensive keyboard input management
+- Key state tracking for arrow keys (left, right, up, down) and spacebar
+- `isKeyDown()` method for continuous key state checks
+- `isKeyPressed()` method for one-time press detection (useful for jump actions)
+- Helper methods: `isLeftDown()`, `isRightDown()`, `isUpDown()`, `isDownDown()`, `isJumpPressed()`
+- Event listeners for keydown and keyup events
+- Window blur handler to clear input state when game loses focus
+- `clearPressed()` method to reset pressed state each frame
+- `destroy()` method for proper cleanup of event listeners
+- Interactive test file `test-input.html` for browser-based testing
+
+### Technical Details
+- Prevents default browser behavior for game keys to avoid page scrolling
+- Proper event handler binding to maintain context
+- O(1) time complexity for all key state queries
+- Memory-efficient key state tracking using simple objects
+- Supports both ' ' and 'Space' key codes for spacebar
+- JSDoc documentation for all public methods
+- Ready for integration with Player entity and game controls
+
 ## [0.4.0] - 2025-11-01
 
 ### Added
@@ -105,6 +128,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Project documentation: README.md
 - Git ignore rules for development environment
 
+[0.5.0]: https://github.com/bearded-wizard/donkey-kong/releases/tag/v0.5.0
 [0.4.0]: https://github.com/bearded-wizard/donkey-kong/releases/tag/v0.4.0
 [0.3.0]: https://github.com/bearded-wizard/donkey-kong/releases/tag/v0.3.0
 [0.2.0]: https://github.com/bearded-wizard/donkey-kong/releases/tag/v0.2.0
