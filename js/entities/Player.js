@@ -81,7 +81,7 @@ class Player {
             this.isJumping = false;
         }
 
-        // Apply physics (gravity disabled when climbing)
+        // Apply physics (gravity disabled when climbing - issue #17)
         const applyGravity = !this.isClimbing;
         if (applyGravity) {
             Physics.applyGravity(this, deltaTime);
@@ -114,7 +114,10 @@ class Player {
 
     /**
      * Handle ladder interaction and climbing logic
-     * Implements acceptance criteria:
+     * Implements issue #17 acceptance criteria:
+     * - Player can climb up on up arrow
+     * - Player can climb down on down arrow
+     * - Disable gravity while climbing
      * - Player can detect when near ladder
      * - Player can enter ladder from top or bottom
      * - Player exits ladder at top/bottom
@@ -262,7 +265,7 @@ class Player {
 
     /**
      * Handle horizontal movement with smooth acceleration/deceleration
-     * Player cannot move left/right while climbing (acceptance criterion)
+     * Player cannot move left/right while climbing (issue #17 acceptance criterion)
      * Implements issue #15: smooth acceleration, max speed limit, facing direction
      * @param {number} deltaTime - Time elapsed since last frame
      */
