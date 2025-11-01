@@ -122,7 +122,7 @@ class GameState {
 
         // Update all barrels (issue #28)
         for (const barrel of this.barrels) {
-            barrel.update(deltaTime, this.level.getPlatforms());
+            barrel.update(deltaTime, this.level.getPlatforms(), this.level.getLadders());
         }
 
         // Remove dead barrels (issue #28)

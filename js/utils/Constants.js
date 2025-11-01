@@ -79,6 +79,9 @@ const Constants = {
     BARREL_ROLL_SPEED: 120,
     BARREL_FALL_SPEED: 150,
 
+    // Barrel ladder behavior (issue #24)
+    BARREL_LADDER_FALL_CHANCE: 0.4, // 40% chance to fall down ladder
+
     // Barrel spawn position (at Donkey Kong)
     BARREL_SPAWN_X: 200,
     BARREL_SPAWN_Y: 120,
