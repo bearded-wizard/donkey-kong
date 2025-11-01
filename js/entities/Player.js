@@ -31,6 +31,9 @@ class Player {
         this.isClimbing = false;
         this.isOnLadder = false; // True when player is aligned with and on a ladder
 
+        // Facing direction: 1 = right, -1 = left
+        this.facingDirection = 1;
+
         // Current ladder reference (null when not climbing)
         this.currentLadder = null;
 
@@ -253,8 +256,10 @@ class Player {
 
         if (isLeft && !isRight) {
             this.velocity.x = -Constants.PLAYER_WALK_SPEED;
+            this.facingDirection = -1; // Facing left
         } else if (isRight && !isLeft) {
             this.velocity.x = Constants.PLAYER_WALK_SPEED;
+            this.facingDirection = 1; // Facing right
         } else {
             // Apply friction when no input
             if (this.isOnGround) {
@@ -367,5 +372,6 @@ class Player {
         this.isClimbing = false;
         this.isOnLadder = false;
         this.currentLadder = null;
+        this.facingDirection = 1;
     }
 }
