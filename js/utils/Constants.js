@@ -44,6 +44,10 @@ const Constants = {
     PLAYER_RUN_SPEED: 250,
     PLAYER_CLIMB_SPEED: 100,
 
+    // Player acceleration (pixels per second squared)
+    PLAYER_ACCELERATION: 800,
+    PLAYER_DECELERATION: 1200,
+
     // Player starting position
     PLAYER_START_X: 100,
     PLAYER_START_Y: 620,
