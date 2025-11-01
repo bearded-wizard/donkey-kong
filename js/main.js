@@ -1,7 +1,7 @@
 /**
  * main.js
  *
- * Main entry point for Donkey Kong game.
+ * Main entry point for Barrel Blaster game.
  * Initializes the game loop and manages frame timing.
  *
  * Updated for issue #37: Uses Game class for state management
@@ -56,7 +56,7 @@ function init() {
     gameLoop(lastFrameTime);
 
     // Log successful initialization
-    console.log('Donkey Kong initialized - Game loop started');
+    console.log('Barrel Blaster initialized - Game loop started');
     console.log('Press SPACE to start game');
 }
 

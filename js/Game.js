@@ -1,7 +1,7 @@
 /**
  * Game.js
  *
- * Main Game class with state management for Donkey Kong.
+ * Main Game class with state management for Barrel Blaster.
  * Implements issue #37: Game class with state management
  *
  * Features:
@@ -233,7 +233,7 @@ class Game {
 
         // Title
         renderer.drawText(
-            'DONKEY KONG',
+            'BARREL BLASTER',
             Constants.CANVAS_WIDTH / 2,
             Constants.CANVAS_HEIGHT / 2 - 100,
             Constants.COLOR_TEXT,
