@@ -99,7 +99,7 @@ class Player {
         // Clamp to screen bounds (issue #15)
         this.clampToScreenBounds();
 
-        // Handle platform collisions
+        // Handle platform collisions (issue #18)
         this.handlePlatformCollisions(platforms);
 
         // Keep velocity in sync
@@ -353,6 +353,12 @@ class Player {
 
     /**
      * Handle collisions with platforms
+     * Implements issue #18 acceptance criteria:
+     * - Player stands on platforms
+     * - Player doesn't fall through platforms
+     * - Platform snap alignment
+     * - Set grounded flag when on platform
+     * - Handle falling off platforms
      * @param {Array<Platform>} platforms - Array of platform objects
      */
     handlePlatformCollisions(platforms) {
@@ -361,7 +367,7 @@ class Player {
             return;
         }
 
-        // Assume not on ground until collision detected
+        // Assume not on ground until collision detected (handles falling off platforms)
         let wasOnGround = this.isOnGround;
         this.isOnGround = false;
 
@@ -369,14 +375,14 @@ class Player {
             const collision = Physics.checkPlatformCollision(this, platform);
 
             if (collision.colliding) {
-                // Snap to platform top
+                // Snap to platform top (platform snap alignment)
                 this.y = collision.snapY;
                 this.position.y = this.y;
 
-                // Stop downward velocity
+                // Stop downward velocity (doesn't fall through platforms)
                 this.velocity.y = 0;
 
-                // Mark as on ground
+                // Mark as on ground (set grounded flag)
                 this.isOnGround = true;
 
                 // Exit climbing when landing on platform
