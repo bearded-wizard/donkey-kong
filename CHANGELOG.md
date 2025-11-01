@@ -5,6 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.0] - 2025-11-01
+
+### Added
+- Vector2D utility class in `js/utils/Vector2D.js` for 2D vector mathematics
+- Core vector operations: add(), subtract(), multiply() (scalar)
+- Vector calculations: magnitude(), normalize(), dot(), distanceTo()
+- Utility methods: clone(), copy(), set(), zero(), toString()
+- Static factory methods: Vector2D.zero(), Vector2D.fromAngle()
+- Static operations: Vector2D.add(), Vector2D.subtract(), Vector2D.multiply()
+- Comprehensive JSDoc documentation for all methods
+- Chainable API for fluent method calls
+
+### Technical Details
+- ES6 class implementation with default parameters
+- All mutating methods return `this` for method chaining
+- Zero-vector safety in normalize() method
+- Ready for use in game physics, movement, and collision detection
+
 ## [0.2.0] - 2025-11-01
 
 ### Added
@@ -62,6 +80,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Project documentation: README.md
 - Git ignore rules for development environment
 
+[0.3.0]: https://github.com/bearded-wizard/donkey-kong/releases/tag/v0.3.0
 [0.2.0]: https://github.com/bearded-wizard/donkey-kong/releases/tag/v0.2.0
 [0.1.0]: https://github.com/bearded-wizard/donkey-kong/releases/tag/v0.1.0
 [0.0.1]: https://github.com/bearded-wizard/donkey-kong/releases/tag/v0.0.1
