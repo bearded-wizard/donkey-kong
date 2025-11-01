@@ -33,16 +33,16 @@ class Barrel {
         this.position = { x: this.x, y: this.y };
         this.velocity = { x: this.velocityX, y: this.velocityY };
 
-        // Rotation for visual rolling effect
-        this.rotation = 0;
-        this.rotationSpeed = 5; // radians per second
+        // Animation for rolling effect (frame-based)
+        this.animationFrame = 0;
+        this.animationTimer = 0;
+        this.animationSpeed = 12; // FPS for barrel rolling animation
 
         // Color fallback
         this.color = Constants.COLOR_BARREL;
 
         // Sprite loading
-        // Sprites: Platformer Art Deluxe by Kenney (www.kenney.nl)
-        // License: CC0 (Public Domain) - See assets/sprites/LICENSE-kenney-deluxe.txt
+        // Custom barrel rolling sprite sheet (8 frames)
         this.spriteSheet = new Image();
         this.spriteSheet.src = 'assets/sprites/barrel.png';
         this.spriteSheetLoaded = false;
@@ -54,9 +54,10 @@ class Barrel {
             this.spriteSheetLoaded = false;
         };
 
-        // Sprite dimensions (bomb.png is 70x70 pixels)
-        this.spriteWidth = 70;
-        this.spriteHeight = 70;
+        // Sprite dimensions (8 frames at 64x64 pixels each = 512x64 sprite sheet)
+        this.spriteWidth = 64;
+        this.spriteHeight = 64;
+        this.spriteFrames = 8; // Total frames in sprite sheet
     }
 
     /**
@@ -78,8 +79,16 @@ class Barrel {
             Physics.applyGravity(this, deltaTime);
         }
 
-        // Update rotation based on horizontal velocity
-        this.rotation += (this.velocity.x / 20) * deltaTime;
+        // Update animation frame based on movement
+        if (this.isRolling || this.isOnLadder) {
+            this.animationTimer += deltaTime;
+            const frameDuration = 1.0 / this.animationSpeed;
+
+            if (this.animationTimer >= frameDuration) {
+                this.animationFrame = (this.animationFrame + 1) % this.spriteFrames;
+                this.animationTimer -= frameDuration;
+            }
+        }
 
         // Update position
         this.position.x += this.velocity.x * deltaTime;
@@ -219,27 +228,23 @@ class Barrel {
     render(renderer) {
         if (!this.isAlive) return;
 
-        // Save canvas state for rotation
-        renderer.save();
-
         const ctx = renderer.getContext();
 
-        // Translate to barrel center for rotation
-        ctx.translate(this.x + this.width / 2, this.y + this.height / 2);
-        ctx.rotate(this.rotation);
-        ctx.translate(-this.width / 2, -this.height / 2);
-
         if (this.spriteSheetLoaded) {
-            // Draw sprite
+            // Calculate source position based on current animation frame
+            const srcX = this.animationFrame * this.spriteWidth;
+            const srcY = 0;
+
+            // Draw the current frame from the sprite sheet
             ctx.drawImage(
                 this.spriteSheet,
-                0, 0, this.spriteWidth, this.spriteHeight,  // Source
-                0, 0, this.width, this.height                // Destination
+                srcX, srcY, this.spriteWidth, this.spriteHeight,  // Source (frame from sprite sheet)
+                this.x, this.y, this.width, this.height            // Destination
             );
         } else {
             // Fallback: circular barrel
             ctx.beginPath();
-            ctx.arc(this.width / 2, this.height / 2, this.width / 2, 0, Math.PI * 2);
+            ctx.arc(this.x + this.width / 2, this.y + this.height / 2, this.width / 2, 0, Math.PI * 2);
             ctx.fillStyle = this.color;
             ctx.fill();
             ctx.strokeStyle = '#654321';
@@ -250,15 +255,12 @@ class Barrel {
             ctx.strokeStyle = '#654321';
             ctx.lineWidth = 1;
             ctx.beginPath();
-            ctx.moveTo(0, this.height / 3);
-            ctx.lineTo(this.width, this.height / 3);
-            ctx.moveTo(0, this.height * 2 / 3);
-            ctx.lineTo(this.width, this.height * 2 / 3);
+            ctx.moveTo(this.x, this.y + this.height / 3);
+            ctx.lineTo(this.x + this.width, this.y + this.height / 3);
+            ctx.moveTo(this.x, this.y + this.height * 2 / 3);
+            ctx.lineTo(this.x + this.width, this.y + this.height * 2 / 3);
             ctx.stroke();
         }
-
-        // Restore canvas state
-        renderer.restore();
     }
 
     /**

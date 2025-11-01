@@ -1,0 +1,73 @@
+<!-- barrel-rolling-sprite.svg | 8 frames × 64px = 512×64 -->
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="64" viewBox="0 0 512 64">
+  <defs>
+    <!-- One reusable barrel drawing at 64×64 -->
+    <g id="barrel">
+      <!-- Outer rim -->
+      <circle cx="32" cy="32" r="30" fill="#6e4730"/>
+      <circle cx="32" cy="32" r="30" fill="none" stroke="#3b2413" stroke-width="4"/>
+
+      <!-- Wood face -->
+      <circle cx="32" cy="32" r="26" fill="#8f5f3b"/>
+
+      <!-- Staves (wood grain "spokes") -->
+      <g stroke="#6e4730" stroke-width="4" stroke-linecap="round" opacity="0.85">
+        <line x1="32" y1="8"  x2="32" y2="56"/>
+        <g transform="rotate(30 32 32)">
+          <line x1="32" y1="8"  x2="32" y2="56"/>
+        </g>
+        <g transform="rotate(60 32 32)">
+          <line x1="32" y1="8"  x2="32" y2="56"/>
+        </g>
+        <g transform="rotate(90 32 32)">
+          <line x1="32" y1="8"  x2="32" y2="56"/>
+        </g>
+        <g transform="rotate(120 32 32)">
+          <line x1="32" y1="8"  x2="32" y2="56"/>
+        </g>
+        <g transform="rotate(150 32 32)">
+          <line x1="32" y1="8"  x2="32" y2="56"/>
+        </g>
+        <g transform="rotate(180 32 32)">
+          <line x1="32" y1="8"  x2="32" y2="56"/>
+        </g>
+        <g transform="rotate(210 32 32)">
+          <line x1="32" y1="8"  x2="32" y2="56"/>
+        </g>
+        <g transform="rotate(240 32 32)">
+          <line x1="32" y1="8"  x2="32" y2="56"/>
+        </g>
+        <g transform="rotate(270 32 32)">
+          <line x1="32" y1="8"  x2="32" y2="56"/>
+        </g>
+        <g transform="rotate(300 32 32)">
+          <line x1="32" y1="8"  x2="32" y2="56"/>
+        </g>
+        <g transform="rotate(330 32 32)">
+          <line x1="32" y1="8"  x2="32" y2="56"/>
+        </g>
+      </g>
+
+      <!-- Metal hoops -->
+      <circle cx="32" cy="32" r="22" fill="none" stroke="#b8c1cc" stroke-width="6"/>
+      <circle cx="32" cy="32" r="16" fill="none" stroke="#9aa3ad" stroke-width="6"/>
+
+      <!-- Bunghole for detail -->
+      <circle cx="46" cy="28" r="3.2" fill="#3b2413" opacity="0.9"/>
+
+      <!-- Simple lighting -->
+      <ellipse cx="24" cy="24" rx="10" ry="6" fill="#ffffff" opacity="0.12"/>
+      <ellipse cx="40" cy="44" rx="10" ry="6" fill="#000000" opacity="0.10"/>
+    </g>
+  </defs>
+
+  <!-- Frames: translate by n*64 and rotate the barrel group around each frame's center -->
+  <g transform="translate(0,0)"><use href="#barrel"/></g>
+  <g transform="translate(64,0) rotate(45 96 32)"><use href="#barrel"/></g>
+  <g transform="translate(128,0) rotate(90 160 32)"><use href="#barrel"/></g>
+  <g transform="translate(192,0) rotate(135 224 32)"><use href="#barrel"/></g>
+  <g transform="translate(256,0) rotate(180 288 32)"><use href="#barrel"/></g>
+  <g transform="translate(320,0) rotate(225 352 32)"><use href="#barrel"/></g>
+  <g transform="translate(384,0) rotate(270 416 32)"><use href="#barrel"/></g>
+  <g transform="translate(448,0) rotate(315 480 32)"><use href="#barrel"/></g>
+</svg>
