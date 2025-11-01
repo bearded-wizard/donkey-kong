@@ -3,15 +3,19 @@
  *
  * Main entry point for Donkey Kong game.
  * Initializes the game loop and manages frame timing.
+ *
+ * Updated for issue #37: Uses Game class for state management
+ * - Initializes Game instance
+ * - Delegates update/render to Game class
+ * - Game class handles all state transitions
  */
 
-// Game state variables
+// Game variables
 let canvas;
 let ctx;
 let renderer;
-let gameState;
+let game;
 let lastFrameTime = 0;
-let isPaused = false;
 let animationId = null;
 
 /**
@@ -39,12 +43,12 @@ function init() {
         return;
     }
 
-    // Initialize game state (when GameState class is available)
-    if (typeof GameState !== 'undefined') {
-        gameState = new GameState(canvas, renderer);
+    // Initialize Game (issue #37)
+    if (typeof Game !== 'undefined') {
+        game = new Game(canvas, renderer);
     } else {
-        console.warn('GameState not yet implemented - running basic game loop');
-        gameState = null;
+        console.error('Game class not found');
+        return;
     }
 
     // Start the game loop
@@ -53,6 +57,7 @@ function init() {
 
     // Log successful initialization
     console.log('Donkey Kong initialized - Game loop started');
+    console.log('Press SPACE to start game');
 }
 
 /**
@@ -67,11 +72,9 @@ function gameLoop(currentTime) {
     // Cap delta time to prevent spiral of death
     const cappedDeltaTime = Math.min(deltaTime, 0.1);
 
-    // Update and render only if not paused
-    if (!isPaused) {
-        update(cappedDeltaTime);
-        render(renderer);
-    }
+    // Update and render (Game class handles pause state)
+    update(cappedDeltaTime);
+    render(renderer);
 
     // Continue the loop
     animationId = requestAnimationFrame(gameLoop);
@@ -82,11 +85,8 @@ function gameLoop(currentTime) {
  * @param {number} deltaTime - Time elapsed since last frame in seconds
  */
 function update(deltaTime) {
-    if (gameState && typeof gameState.update === 'function') {
-        gameState.update(deltaTime);
-    } else {
-        // Placeholder update logic for when GameState doesn't exist yet
-        // This ensures the game loop is functional
+    if (game && typeof game.update === 'function') {
+        game.update(deltaTime);
     }
 }
 
@@ -95,57 +95,38 @@ function update(deltaTime) {
  * @param {Renderer} renderer - Renderer instance
  */
 function render(renderer) {
-    // Clear canvas
-    renderer.clear();
-
-    if (gameState && typeof gameState.render === 'function') {
-        gameState.render(renderer);
-    } else {
-        // Placeholder render logic showing the game is running
-        renderer.drawText(
-            'Donkey Kong - Game Loop Active',
-            Constants.CANVAS_WIDTH / 2,
-            Constants.CANVAS_HEIGHT / 2,
-            Constants.COLOR_TEXT,
-            '32px monospace',
-            'center'
-        );
-        renderer.drawText(
-            'Waiting for GameState implementation...',
-            Constants.CANVAS_WIDTH / 2,
-            Constants.CANVAS_HEIGHT / 2 + 40,
-            Constants.COLOR_TEXT,
-            '16px monospace',
-            'center'
-        );
+    if (game && typeof game.render === 'function') {
+        game.render(renderer);
     }
 }
 
 /**
- * Pause the game
+ * Pause the game (delegates to Game class)
  */
 function pauseGame() {
-    isPaused = true;
-    console.log('Game paused');
+    if (game && typeof game.pause === 'function') {
+        game.pause();
+        console.log('Game paused');
+    }
 }
 
 /**
- * Resume the game
+ * Resume the game (delegates to Game class)
  */
 function resumeGame() {
-    isPaused = false;
-    lastFrameTime = performance.now(); // Reset time to prevent large delta
-    console.log('Game resumed');
+    if (game && typeof game.resume === 'function') {
+        game.resume();
+        lastFrameTime = performance.now(); // Reset time to prevent large delta
+        console.log('Game resumed');
+    }
 }
 
 /**
- * Toggle pause state
+ * Toggle pause state (delegates to Game class)
  */
 function togglePause() {
-    if (isPaused) {
-        resumeGame();
-    } else {
-        pauseGame();
+    if (game && typeof game.togglePause === 'function') {
+        game.togglePause();
     }
 }
 
