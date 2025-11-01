@@ -127,6 +127,9 @@ class GameState {
         // Check player-barrel collisions (issue #25)
         this.checkPlayerBarrelCollisions();
 
+        // Check win condition (issue #34)
+        this.checkWinCondition();
+
         // Keep player within bounds
         this.constrainPlayerToBounds();
     }
@@ -220,6 +223,46 @@ class GameState {
                 'center'
             );
         }
+
+        // Level complete message (issue #34)
+        if (this.currentState === Constants.STATE_LEVEL_COMPLETE) {
+            renderer.drawText(
+                'LEVEL COMPLETE!',
+                Constants.CANVAS_WIDTH / 2,
+                Constants.CANVAS_HEIGHT / 2 - 40,
+                Constants.COLOR_UI_YELLOW,
+                '48px monospace',
+                'center'
+            );
+            renderer.drawText(
+                'Press SPACE to continue',
+                Constants.CANVAS_WIDTH / 2,
+                Constants.CANVAS_HEIGHT / 2 + 20,
+                Constants.COLOR_TEXT,
+                '24px monospace',
+                'center'
+            );
+        }
+
+        // Game over message
+        if (this.currentState === Constants.STATE_GAME_OVER) {
+            renderer.drawText(
+                'GAME OVER',
+                Constants.CANVAS_WIDTH / 2,
+                Constants.CANVAS_HEIGHT / 2 - 40,
+                Constants.COLOR_UI_RED,
+                '48px monospace',
+                'center'
+            );
+            renderer.drawText(
+                'Press SPACE to restart',
+                Constants.CANVAS_WIDTH / 2,
+                Constants.CANVAS_HEIGHT / 2 + 20,
+                Constants.COLOR_TEXT,
+                '24px monospace',
+                'center'
+            );
+        }
     }
 
     /**
@@ -305,6 +348,38 @@ class GameState {
                 // Only check one barrel collision per frame
                 break;
             }
+        }
+    }
+
+    /**
+     * Check win condition - player reaching princess (issue #34)
+     */
+    checkWinCondition() {
+        if (this.currentState !== Constants.STATE_PLAYING) {
+            return;
+        }
+
+        // Check collision with princess
+        const playerBounds = this.player.getBounds();
+        const princessBounds = this.princess.getBounds();
+
+        const colliding = (
+            playerBounds.x < princessBounds.x + princessBounds.width &&
+            playerBounds.x + playerBounds.width > princessBounds.x &&
+            playerBounds.y < princessBounds.y + princessBounds.height &&
+            playerBounds.y + playerBounds.height > princessBounds.y
+        );
+
+        if (colliding) {
+            // Award completion points
+            this.score += Constants.POINTS_REACH_PRINCESS;
+
+            // TODO: Calculate and award time bonus (future enhancement)
+            // const timeBonus = (Constants.LEVEL_TIME_LIMIT - this.elapsedTime) * Constants.POINTS_TIME_BONUS;
+            // this.score += timeBonus;
+
+            // Transition to level complete state
+            this.currentState = Constants.STATE_LEVEL_COMPLETE;
         }
     }
 }
