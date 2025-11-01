@@ -5,6 +5,31 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.23.0] - 2025-11-01
+
+### Added
+- **Barrel spawning logic** (issue #28)
+  - DonkeyKong periodically throws barrels at random intervals (2-5 seconds)
+  - Barrels spawn from DonkeyKong's position at top of level
+  - Maximum 8 barrels on screen at once (enforced via MAX_BARRELS constant)
+  - Barrels roll down platforms with physics-based movement
+  - Dead barrels automatically cleaned up when off-screen
+- **DonkeyKong entity integration**
+  - DonkeyKong appears at top platform (Constants.DK_X, Constants.DK_Y)
+  - Throwing animation state when spawning barrels
+  - Random throw delay using BARREL_SPAWN_MIN_DELAY and BARREL_SPAWN_MAX_DELAY
+- **Princess entity integration**
+  - Princess appears at goal position at top of level
+  - Idle animation state
+- **System stub files**
+  - CollisionDetector.js stub (prevents 404 errors)
+  - AudioManager.js stub (prevents 404 errors)
+
+### Changed
+- **GameState.js** now manages DonkeyKong, Princess, and barrels array
+- Barrel spawning uses randomized timing instead of fixed intervals
+- Game loop updates all barrels and removes dead ones each frame
+
 ## [0.22.0] - 2025-11-01
 
 ### Added
