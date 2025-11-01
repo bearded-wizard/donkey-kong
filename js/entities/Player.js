@@ -78,6 +78,9 @@ class Player {
         this.x = this.position.x;
         this.y = this.position.y;
 
+        // Clamp to screen bounds (issue #15)
+        this.clampToScreenBounds();
+
         // Handle platform collisions
         this.handlePlatformCollisions(platforms);
 
@@ -240,8 +243,9 @@ class Player {
     }
 
     /**
-     * Handle horizontal movement
+     * Handle horizontal movement with smooth acceleration/deceleration
      * Player cannot move left/right while climbing (acceptance criterion)
+     * Implements issue #15: smooth acceleration, max speed limit, facing direction
      * @param {number} deltaTime - Time elapsed since last frame
      */
     handleMovement(deltaTime) {
@@ -255,23 +259,64 @@ class Player {
         const isRight = this.inputHandler.isRightDown();
 
         if (isLeft && !isRight) {
-            this.velocity.x = -Constants.PLAYER_WALK_SPEED;
+            // Accelerate left
+            this.velocity.x -= Constants.PLAYER_ACCELERATION * deltaTime;
+
+            // Clamp to max speed
+            if (this.velocity.x < -Constants.PLAYER_WALK_SPEED) {
+                this.velocity.x = -Constants.PLAYER_WALK_SPEED;
+            }
+
             this.facingDirection = -1; // Facing left
         } else if (isRight && !isLeft) {
-            this.velocity.x = Constants.PLAYER_WALK_SPEED;
+            // Accelerate right
+            this.velocity.x += Constants.PLAYER_ACCELERATION * deltaTime;
+
+            // Clamp to max speed
+            if (this.velocity.x > Constants.PLAYER_WALK_SPEED) {
+                this.velocity.x = Constants.PLAYER_WALK_SPEED;
+            }
+
             this.facingDirection = 1; // Facing right
         } else {
-            // Apply friction when no input
-            if (this.isOnGround) {
-                this.velocity.x *= Constants.GROUND_FRICTION;
-                // Stop completely if moving very slowly
-                if (Math.abs(this.velocity.x) < 1) {
+            // Decelerate when no input
+            if (this.velocity.x > 0) {
+                // Moving right, decelerate
+                this.velocity.x -= Constants.PLAYER_DECELERATION * deltaTime;
+                if (this.velocity.x < 0) {
                     this.velocity.x = 0;
                 }
-            } else {
-                // Less friction in air
-                this.velocity.x *= Constants.AIR_RESISTANCE;
+            } else if (this.velocity.x < 0) {
+                // Moving left, decelerate
+                this.velocity.x += Constants.PLAYER_DECELERATION * deltaTime;
+                if (this.velocity.x > 0) {
+                    this.velocity.x = 0;
+                }
             }
+        }
+    }
+
+    /**
+     * Clamp player position to screen bounds
+     * Prevents player from moving off-screen (issue #15)
+     */
+    clampToScreenBounds() {
+        // Clamp X position
+        if (this.x < 0) {
+            this.x = 0;
+            this.position.x = 0;
+            this.velocity.x = 0;
+        } else if (this.x + this.width > Constants.CANVAS_WIDTH) {
+            this.x = Constants.CANVAS_WIDTH - this.width;
+            this.position.x = this.x;
+            this.velocity.x = 0;
+        }
+
+        // Clamp Y position (mainly for falling off bottom)
+        if (this.y > Constants.CANVAS_HEIGHT) {
+            this.y = Constants.CANVAS_HEIGHT - this.height;
+            this.position.y = this.y;
+            this.velocity.y = 0;
         }
     }
 
