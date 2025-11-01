@@ -58,6 +58,12 @@ const Constants = {
     // Player animation frame rate (frames per second)
     PLAYER_ANIMATION_FPS: 8,
 
+    // Player animation states (issue #19)
+    PLAYER_ANIM_STATE_IDLE: 'idle',
+    PLAYER_ANIM_STATE_WALK: 'walk',
+    PLAYER_ANIM_STATE_JUMP: 'jump',
+    PLAYER_ANIM_STATE_CLIMB: 'climb',
+
     // Player lives
     PLAYER_STARTING_LIVES: 3,
 

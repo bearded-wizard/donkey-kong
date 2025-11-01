@@ -41,6 +41,11 @@ class Player {
         // Color
         this.color = Constants.COLOR_PLAYER;
 
+        // Animation state (issue #19)
+        this.animationState = Constants.PLAYER_ANIM_STATE_IDLE;
+        this.animationFrame = 0;
+        this.animationTimer = 0;
+
         // Physics object for compatibility with Physics class
         this.position = { x: this.x, y: this.y };
         this.velocity = { x: this.velocityX, y: this.velocityY };
@@ -105,6 +110,9 @@ class Player {
         // Keep velocity in sync
         this.velocityX = this.velocity.x;
         this.velocityY = this.velocity.y;
+
+        // Update animation state (issue #19)
+        this.updateAnimationState(deltaTime);
 
         // Clear pressed keys for next frame
         if (this.inputHandler) {
@@ -318,6 +326,50 @@ class Player {
     }
 
     /**
+     * Update animation state based on player movement
+     * Implements issue #19: player animation state machine
+     * - Idle state when stationary
+     * - Walk state when moving horizontally
+     * - Jump state when airborne
+     * - Climb state when on ladder
+     * @param {number} deltaTime - Time elapsed since last frame in seconds
+     */
+    updateAnimationState(deltaTime) {
+        // Store previous state for transition detection
+        const previousState = this.animationState;
+
+        // Determine new animation state based on movement
+        if (this.isClimbing) {
+            // Climb state has priority when on ladder
+            this.animationState = Constants.PLAYER_ANIM_STATE_CLIMB;
+        } else if (!this.isOnGround) {
+            // Jump state when airborne
+            this.animationState = Constants.PLAYER_ANIM_STATE_JUMP;
+        } else if (Math.abs(this.velocity.x) > 1) {
+            // Walk state when moving horizontally
+            this.animationState = Constants.PLAYER_ANIM_STATE_WALK;
+        } else {
+            // Idle state when stationary on ground
+            this.animationState = Constants.PLAYER_ANIM_STATE_IDLE;
+        }
+
+        // Reset animation frame on state transition (smooth transitions)
+        if (this.animationState !== previousState) {
+            this.animationFrame = 0;
+            this.animationTimer = 0;
+        }
+
+        // Update animation frame counter
+        this.animationTimer += deltaTime;
+        const frameDuration = 1.0 / Constants.PLAYER_ANIMATION_FPS;
+
+        if (this.animationTimer >= frameDuration) {
+            this.animationFrame++;
+            this.animationTimer -= frameDuration;
+        }
+    }
+
+    /**
      * Clamp player position to screen bounds
      * Prevents player from moving off-screen (issue #15)
      */
@@ -448,5 +500,8 @@ class Player {
         this.isJumping = false;
         this.currentLadder = null;
         this.facingDirection = 1;
+        this.animationState = Constants.PLAYER_ANIM_STATE_IDLE;
+        this.animationFrame = 0;
+        this.animationTimer = 0;
     }
 }
