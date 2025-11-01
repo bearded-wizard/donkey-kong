@@ -124,6 +124,9 @@ class GameState {
         // Remove dead barrels (issue #28)
         this.barrels = this.barrels.filter(barrel => barrel.isActive());
 
+        // Check player-barrel collisions (issue #25)
+        this.checkPlayerBarrelCollisions();
+
         // Keep player within bounds
         this.constrainPlayerToBounds();
     }
@@ -259,5 +262,49 @@ class GameState {
         const spawnPos = this.donkeyKong.getBarrelSpawnPosition();
         const barrel = new Barrel(spawnPos.x, spawnPos.y);
         this.barrels.push(barrel);
+    }
+
+    /**
+     * Check collision between player and barrels (issue #25)
+     * Handles player death, life loss, and game over
+     */
+    checkPlayerBarrelCollisions() {
+        const playerBounds = this.player.getBounds();
+
+        for (const barrel of this.barrels) {
+            if (!barrel.isActive()) continue;
+
+            const barrelBounds = barrel.getBounds();
+
+            // AABB collision detection
+            const colliding = (
+                playerBounds.x < barrelBounds.x + barrelBounds.width &&
+                playerBounds.x + playerBounds.width > barrelBounds.x &&
+                playerBounds.y < barrelBounds.y + barrelBounds.height &&
+                playerBounds.y + playerBounds.height > barrelBounds.y
+            );
+
+            if (colliding) {
+                // Try to damage player (returns false if invincible)
+                const damageTaken = this.player.takeDamage();
+
+                if (damageTaken) {
+                    // Player took damage
+                    this.lives--;
+
+                    if (this.lives <= 0) {
+                        // Game over
+                        this.currentState = Constants.STATE_GAME_OVER;
+                    } else {
+                        // Respawn player
+                        const playerStart = this.level.getPlayerStartPosition();
+                        this.player.reset(playerStart.x, playerStart.y);
+                    }
+                }
+
+                // Only check one barrel collision per frame
+                break;
+            }
+        }
     }
 }

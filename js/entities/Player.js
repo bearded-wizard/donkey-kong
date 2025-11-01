@@ -35,6 +35,10 @@ class Player {
         // Facing direction: 1 = right, -1 = left
         this.facingDirection = 1;
 
+        // Invincibility (issue #25)
+        this.isInvincible = false;
+        this.invincibilityTimer = 0;
+
         // Current ladder reference (null when not climbing)
         this.currentLadder = null;
 
@@ -159,6 +163,15 @@ class Player {
 
         // Update animation state (issue #19)
         this.updateAnimationState(deltaTime);
+
+        // Update invincibility timer (issue #25)
+        if (this.isInvincible) {
+            this.invincibilityTimer -= deltaTime;
+            if (this.invincibilityTimer <= 0) {
+                this.isInvincible = false;
+                this.invincibilityTimer = 0;
+            }
+        }
 
         // Clear pressed keys for next frame
         if (this.inputHandler) {
@@ -505,6 +518,18 @@ class Player {
         // Get canvas context for advanced operations
         const ctx = renderer.getContext();
 
+        // Apply invincibility flashing effect (issue #25)
+        if (this.isInvincible) {
+            // Flash at 8 Hz (8 times per second)
+            const flashFrequency = 8;
+            const visible = Math.floor(this.invincibilityTimer * flashFrequency) % 2 === 0;
+            if (!visible) {
+                // Skip rendering this frame for flashing effect
+                renderer.restore();
+                return;
+            }
+        }
+
         // Apply horizontal flip based on facing direction
         if (this.facingDirection === -1) {
             // Flip horizontally for left-facing
@@ -748,6 +773,22 @@ class Player {
     }
 
     /**
+     * Handle damage from barrel collision (issue #25)
+     * @returns {boolean} True if player took damage (not invincible)
+     */
+    takeDamage() {
+        if (this.isInvincible) {
+            return false; // Player is invincible, no damage taken
+        }
+
+        // Grant invincibility period
+        this.isInvincible = true;
+        this.invincibilityTimer = Constants.INVINCIBILITY_DURATION;
+
+        return true; // Damage taken
+    }
+
+    /**
      * Reset player to starting position
      * @param {number} x - X position
      * @param {number} y - Y position
@@ -770,5 +811,8 @@ class Player {
         this.animationState = Constants.PLAYER_ANIM_STATE_IDLE;
         this.animationFrame = 0;
         this.animationTimer = 0;
+        // Reset invincibility (issue #25)
+        this.isInvincible = true; // Grant invincibility on respawn
+        this.invincibilityTimer = Constants.INVINCIBILITY_DURATION;
     }
 }
