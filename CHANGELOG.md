@@ -5,6 +5,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.7.0] - 2025-11-01
+
+### Added
+- Physics class in `js/systems/Physics.js` for gravity and velocity calculations
+- `applyGravity()` method for applying gravity using Euler integration
+- `updateVelocity()` method for updating entity position based on velocity
+- `clampVelocity()` method to enforce terminal velocity limits
+- `update()` method for complete physics cycle (gravity + clamp + position update)
+- Integration with delta time for frame-independent physics simulation
+- Error handling and validation for invalid entities in all methods
+- Comprehensive JSDoc documentation for all public methods
+
+### Technical Details
+- Uses Euler integration for physics calculations (p = p + v*dt, v = v + a*dt)
+- Gravity constant: 980 pixels/second² (from Constants.GRAVITY)
+- Terminal velocity: 500 pixels/second both upward and downward (from Constants.MAX_FALL_SPEED)
+- All methods support delta time for smooth, frame-independent gameplay
+- Optional gravity flag in update() method for entities that don't need gravity
+- Ready for integration with Player, Barrel, and other game entities
+
 ## [0.6.0] - 2025-11-01
 
 ### Added
@@ -151,6 +171,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Project documentation: README.md
 - Git ignore rules for development environment
 
+[0.7.0]: https://github.com/bearded-wizard/donkey-kong/releases/tag/v0.7.0
 [0.6.0]: https://github.com/bearded-wizard/donkey-kong/releases/tag/v0.6.0
 [0.5.0]: https://github.com/bearded-wizard/donkey-kong/releases/tag/v0.5.0
 [0.4.0]: https://github.com/bearded-wizard/donkey-kong/releases/tag/v0.4.0
