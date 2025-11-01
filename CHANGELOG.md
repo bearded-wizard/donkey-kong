@@ -5,6 +5,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.15.1] - 2025-11-01
+
+### Documentation
+- Added issue #17 references to ladder climbing code documentation
+- Formally closes issue #17 with proper code references
+
+### Notes
+- Ladder climbing functionality was already fully implemented in v0.12.0
+- This is a documentation-only release with no functional changes
+- All acceptance criteria for issue #17 were already met:
+  - ✅ Player can climb up on up arrow
+  - ✅ Player can climb down on down arrow
+  - ✅ Disable gravity while climbing
+  - ✅ Exit ladder at top/bottom
+  - ✅ Cannot move left/right while climbing
+- Technical requirements already implemented:
+  - ✅ Climbing speed from constants (PLAYER_CLIMB_SPEED: 100 px/s)
+  - ✅ Center player on ladder X position
+  - ✅ Check for ladder exit conditions
+
 ## [0.15.0] - 2025-11-01
 
 ### Added
@@ -381,6 +401,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Project documentation: README.md
 - Git ignore rules for development environment
 
+[0.15.1]: https://github.com/bearded-wizard/donkey-kong/releases/tag/v0.15.1
 [0.15.0]: https://github.com/bearded-wizard/donkey-kong/releases/tag/v0.15.0
 [0.14.0]: https://github.com/bearded-wizard/donkey-kong/releases/tag/v0.14.0
 [0.13.0]: https://github.com/bearded-wizard/donkey-kong/releases/tag/v0.13.0
