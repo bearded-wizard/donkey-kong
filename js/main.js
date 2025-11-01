@@ -8,6 +8,7 @@
 // Game state variables
 let canvas;
 let ctx;
+let renderer;
 let gameState;
 let lastFrameTime = 0;
 let isPaused = false;
@@ -30,12 +31,17 @@ function init() {
         return;
     }
 
-    // Disable image smoothing for pixel-perfect rendering
-    ctx.imageSmoothingEnabled = false;
+    // Initialize Renderer
+    try {
+        renderer = new Renderer(canvas);
+    } catch (error) {
+        console.error('Failed to initialize Renderer:', error);
+        return;
+    }
 
     // Initialize game state (when GameState class is available)
     if (typeof GameState !== 'undefined') {
-        gameState = new GameState(canvas, ctx);
+        gameState = new GameState(canvas, renderer);
     } else {
         console.warn('GameState not yet implemented - running basic game loop');
         gameState = null;
@@ -64,7 +70,7 @@ function gameLoop(currentTime) {
     // Update and render only if not paused
     if (!isPaused) {
         update(cappedDeltaTime);
-        render(ctx);
+        render(renderer);
     }
 
     // Continue the loop
@@ -86,23 +92,32 @@ function update(deltaTime) {
 
 /**
  * Render game graphics
- * @param {CanvasRenderingContext2D} ctx - Canvas rendering context
+ * @param {Renderer} renderer - Renderer instance
  */
-function render(ctx) {
+function render(renderer) {
     // Clear canvas
-    ctx.fillStyle = Constants.COLOR_BACKGROUND;
-    ctx.fillRect(0, 0, Constants.CANVAS_WIDTH, Constants.CANVAS_HEIGHT);
+    renderer.clear();
 
     if (gameState && typeof gameState.render === 'function') {
-        gameState.render(ctx);
+        gameState.render(renderer);
     } else {
         // Placeholder render logic showing the game is running
-        ctx.fillStyle = Constants.COLOR_TEXT;
-        ctx.font = '32px monospace';
-        ctx.textAlign = 'center';
-        ctx.fillText('Donkey Kong - Game Loop Active', Constants.CANVAS_WIDTH / 2, Constants.CANVAS_HEIGHT / 2);
-        ctx.font = '16px monospace';
-        ctx.fillText('Waiting for GameState implementation...', Constants.CANVAS_WIDTH / 2, Constants.CANVAS_HEIGHT / 2 + 40);
+        renderer.drawText(
+            'Donkey Kong - Game Loop Active',
+            Constants.CANVAS_WIDTH / 2,
+            Constants.CANVAS_HEIGHT / 2,
+            Constants.COLOR_TEXT,
+            '32px monospace',
+            'center'
+        );
+        renderer.drawText(
+            'Waiting for GameState implementation...',
+            Constants.CANVAS_WIDTH / 2,
+            Constants.CANVAS_HEIGHT / 2 + 40,
+            Constants.COLOR_TEXT,
+            '16px monospace',
+            'center'
+        );
     }
 }
 
