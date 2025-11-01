@@ -5,6 +5,29 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.6.0] - 2025-11-01
+
+### Added
+- Renderer class in `js/systems/Renderer.js` as canvas context wrapper
+- `clear()` method for clearing canvas with background color
+- `drawRect()` and `drawRectOutline()` methods for rectangle rendering
+- `drawImage()` method for image rendering with optional dimensions
+- `drawImagePortion()` method for sprite sheet support
+- `drawText()` method for text rendering with alignment support
+- Camera offset support via `setCameraOffset()` for future scrolling features
+- Alpha/opacity control via `setAlpha()` method
+- Canvas state `save()` and `restore()` methods
+- Main.js integration: updated to use Renderer instead of raw canvas context
+
+### Technical Details
+- Pixel-perfect rendering with disabled image smoothing
+- Camera offset applied to all drawing operations (world space → screen space)
+- Alpha value clamped between 0.0 and 1.0
+- Support for both full image rendering and sprite sheet portions
+- Text alignment options: left, center, right
+- Provides `getContext()` for advanced operations when needed
+- Graceful error handling for invalid canvas or image references
+
 ## [0.5.0] - 2025-11-01
 
 ### Added
@@ -128,6 +151,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Project documentation: README.md
 - Git ignore rules for development environment
 
+[0.6.0]: https://github.com/bearded-wizard/donkey-kong/releases/tag/v0.6.0
 [0.5.0]: https://github.com/bearded-wizard/donkey-kong/releases/tag/v0.5.0
 [0.4.0]: https://github.com/bearded-wizard/donkey-kong/releases/tag/v0.4.0
 [0.3.0]: https://github.com/bearded-wizard/donkey-kong/releases/tag/v0.3.0
