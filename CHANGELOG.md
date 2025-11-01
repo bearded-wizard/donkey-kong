@@ -5,6 +5,32 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.26.0] - 2025-11-01
+
+### Added
+- **Hammer power-up mechanics** (issue #36)
+  - Player can pick up hammer power-up placed on platform 2
+  - Hammer grants ability to destroy barrels on collision
+  - Awards 300 points (POINTS_BARREL_SMASH) per barrel destroyed
+  - Hammer expires after 10 seconds (HAMMER_DURATION constant)
+  - Visual hammer indicator icon displayed near player when active
+  - Timer countdown shown in UI with yellow text ("HAMMER: Xs")
+- **Hammer-barrel interaction**
+  - Barrel destruction on collision when player has hammer
+  - Points awarded for each barrel smashed
+  - Multiple barrels can be destroyed while hammer is active
+- **Player hammer state**
+  - hasHammer and hammerTimer properties in Player class
+  - pickupHammer() method to activate power-up
+  - Automatic hammer expiration when timer reaches 0
+  - Hammer state reset on player death/respawn
+
+### Changed
+- checkPlayerBarrelCollisions() now handles barrel destruction with hammer
+- Player.render() displays gold hammer icon when power-up is active
+- GameState spawns hammer power-ups on level platforms
+- Hammer updates and renders every frame
+
 ## [0.25.0] - 2025-11-01
 
 ### Added
