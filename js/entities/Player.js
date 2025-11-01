@@ -448,23 +448,195 @@ class Player {
     }
 
     /**
-     * Render the player
+     * Render the player with visual animation (issue #20)
      * @param {Renderer} renderer - The game renderer
      */
     render(renderer) {
-        // Draw player as a simple rectangle
-        renderer.drawRect(this.x, this.y, this.width, this.height, this.color);
+        // Save canvas state for transformations
+        renderer.save();
 
-        // Debug: Draw a small indicator when climbing
-        if (this.isClimbing) {
-            renderer.drawRect(
-                this.x + this.width / 2 - 3,
-                this.y - 10,
-                6,
-                6,
-                Constants.COLOR_LADDER
-            );
+        // Get canvas context for advanced operations
+        const ctx = renderer.getContext();
+
+        // Apply horizontal flip based on facing direction
+        if (this.facingDirection === -1) {
+            // Flip horizontally for left-facing
+            ctx.translate(this.x + this.width, this.y);
+            ctx.scale(-1, 1);
+            ctx.translate(-this.x, -this.y);
         }
+
+        // Render based on animation state (issue #20)
+        switch (this.animationState) {
+            case Constants.PLAYER_ANIM_STATE_IDLE:
+                this.renderIdle(renderer);
+                break;
+            case Constants.PLAYER_ANIM_STATE_WALK:
+                this.renderWalk(renderer);
+                break;
+            case Constants.PLAYER_ANIM_STATE_JUMP:
+                this.renderJump(renderer);
+                break;
+            case Constants.PLAYER_ANIM_STATE_CLIMB:
+                this.renderClimb(renderer);
+                break;
+            default:
+                // Fallback to simple rectangle
+                renderer.drawRect(this.x, this.y, this.width, this.height, this.color);
+                break;
+        }
+
+        // Restore canvas state
+        renderer.restore();
+    }
+
+    /**
+     * Render idle state (issue #20)
+     * Standing still pose
+     * @param {Renderer} renderer - The game renderer
+     */
+    renderIdle(renderer) {
+        const x = this.x;
+        const y = this.y;
+        const w = this.width;
+        const h = this.height;
+
+        // Body (main rectangle)
+        renderer.drawRect(x + w * 0.25, y + h * 0.3, w * 0.5, h * 0.5, this.color);
+
+        // Head
+        renderer.drawRect(x + w * 0.3, y + h * 0.1, w * 0.4, h * 0.25, this.color);
+
+        // Legs
+        renderer.drawRect(x + w * 0.3, y + h * 0.8, w * 0.15, h * 0.2, this.color);
+        renderer.drawRect(x + w * 0.55, y + h * 0.8, w * 0.15, h * 0.2, this.color);
+
+        // Eyes (facing direction indicator)
+        const eyeColor = '#FFFFFF';
+        renderer.drawRect(x + w * 0.55, y + h * 0.15, w * 0.1, h * 0.08, eyeColor);
+    }
+
+    /**
+     * Render walk animation (issue #20)
+     * Animated walking cycle with leg movement
+     * @param {Renderer} renderer - The game renderer
+     */
+    renderWalk(renderer) {
+        const x = this.x;
+        const y = this.y;
+        const w = this.width;
+        const h = this.height;
+
+        // Determine walk frame (4 frames for smooth walk cycle)
+        const walkFrame = this.animationFrame % 4;
+
+        // Body (bobs slightly while walking)
+        const bodyBob = (walkFrame === 1 || walkFrame === 3) ? -1 : 0;
+        renderer.drawRect(x + w * 0.25, y + h * 0.3 + bodyBob, w * 0.5, h * 0.5, this.color);
+
+        // Head (bobs with body)
+        renderer.drawRect(x + w * 0.3, y + h * 0.1 + bodyBob, w * 0.4, h * 0.25, this.color);
+
+        // Legs (animated walk cycle)
+        let leftLegY, rightLegY, leftLegH, rightLegH;
+        switch (walkFrame) {
+            case 0: // Left leg forward, right leg back
+                leftLegY = y + h * 0.75;
+                leftLegH = h * 0.25;
+                rightLegY = y + h * 0.8;
+                rightLegH = h * 0.2;
+                break;
+            case 1: // Both legs center
+                leftLegY = y + h * 0.8;
+                leftLegH = h * 0.2;
+                rightLegY = y + h * 0.8;
+                rightLegH = h * 0.2;
+                break;
+            case 2: // Right leg forward, left leg back
+                leftLegY = y + h * 0.8;
+                leftLegH = h * 0.2;
+                rightLegY = y + h * 0.75;
+                rightLegH = h * 0.25;
+                break;
+            case 3: // Both legs center
+                leftLegY = y + h * 0.8;
+                leftLegH = h * 0.2;
+                rightLegY = y + h * 0.8;
+                rightLegH = h * 0.2;
+                break;
+        }
+        renderer.drawRect(x + w * 0.3, leftLegY, w * 0.15, leftLegH, this.color);
+        renderer.drawRect(x + w * 0.55, rightLegY, w * 0.15, rightLegH, this.color);
+
+        // Eyes
+        const eyeColor = '#FFFFFF';
+        renderer.drawRect(x + w * 0.55, y + h * 0.15 + bodyBob, w * 0.1, h * 0.08, eyeColor);
+    }
+
+    /**
+     * Render jump animation (issue #20)
+     * Mid-air pose with legs tucked
+     * @param {Renderer} renderer - The game renderer
+     */
+    renderJump(renderer) {
+        const x = this.x;
+        const y = this.y;
+        const w = this.width;
+        const h = this.height;
+
+        // Body
+        renderer.drawRect(x + w * 0.25, y + h * 0.3, w * 0.5, h * 0.5, this.color);
+
+        // Head
+        renderer.drawRect(x + w * 0.3, y + h * 0.1, w * 0.4, h * 0.25, this.color);
+
+        // Legs (tucked for jumping)
+        renderer.drawRect(x + w * 0.3, y + h * 0.75, w * 0.4, h * 0.15, this.color);
+
+        // Eyes
+        const eyeColor = '#FFFFFF';
+        renderer.drawRect(x + w * 0.55, y + h * 0.15, w * 0.1, h * 0.08, eyeColor);
+    }
+
+    /**
+     * Render climb animation (issue #20)
+     * Climbing pose with alternating arm positions
+     * @param {Renderer} renderer - The game renderer
+     */
+    renderClimb(renderer) {
+        const x = this.x;
+        const y = this.y;
+        const w = this.width;
+        const h = this.height;
+
+        // Determine climb frame (2 frames for arm alternation)
+        const climbFrame = this.animationFrame % 2;
+
+        // Body (centered on ladder)
+        renderer.drawRect(x + w * 0.3, y + h * 0.3, w * 0.4, h * 0.5, this.color);
+
+        // Head
+        renderer.drawRect(x + w * 0.3, y + h * 0.1, w * 0.4, h * 0.25, this.color);
+
+        // Arms (alternating high/low for climbing motion)
+        if (climbFrame === 0) {
+            // Left arm high, right arm low
+            renderer.drawRect(x + w * 0.15, y + h * 0.35, w * 0.15, h * 0.1, this.color);
+            renderer.drawRect(x + w * 0.7, y + h * 0.5, w * 0.15, h * 0.1, this.color);
+        } else {
+            // Right arm high, left arm low
+            renderer.drawRect(x + w * 0.15, y + h * 0.5, w * 0.15, h * 0.1, this.color);
+            renderer.drawRect(x + w * 0.7, y + h * 0.35, w * 0.15, h * 0.1, this.color);
+        }
+
+        // Legs (on ladder)
+        renderer.drawRect(x + w * 0.3, y + h * 0.8, w * 0.15, h * 0.2, this.color);
+        renderer.drawRect(x + w * 0.55, y + h * 0.8, w * 0.15, h * 0.2, this.color);
+
+        // Eyes (front facing when climbing)
+        const eyeColor = '#FFFFFF';
+        renderer.drawRect(x + w * 0.4, y + h * 0.15, w * 0.08, h * 0.08, eyeColor);
+        renderer.drawRect(x + w * 0.52, y + h * 0.15, w * 0.08, h * 0.08, eyeColor);
     }
 
     /**
