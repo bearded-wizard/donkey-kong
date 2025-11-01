@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>InputHandler Test</title>
+    <style>
+        body {
+            font-family: monospace;
+            padding: 20px;
+            background: #000;
+            color: #0f0;
+        }
+        .key-display {
+            margin: 10px 0;
+            padding: 10px;
+            background: #111;
+            border: 1px solid #0f0;
+        }
+        .active {
+            background: #0f0;
+            color: #000;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>InputHandler Test</h1>
+    <p>Press arrow keys and spacebar to test the InputHandler</p>
+
+    <div class="key-display" id="left">Left Arrow: <span id="left-status">Not Pressed</span></div>
+    <div class="key-display" id="right">Right Arrow: <span id="right-status">Not Pressed</span></div>
+    <div class="key-display" id="up">Up Arrow: <span id="up-status">Not Pressed</span></div>
+    <div class="key-display" id="down">Down Arrow: <span id="down-status">Not Pressed</span></div>
+    <div class="key-display" id="space">Spacebar: <span id="space-status">Not Pressed</span></div>
+
+    <div style="margin-top: 20px;">
+        <h3>Just Pressed Events:</h3>
+        <div id="pressed-log" style="background: #111; padding: 10px; min-height: 100px; border: 1px solid #0f0;"></div>
+    </div>
+
+    <script src="js/systems/InputHandler.js"></script>
+    <script>
+        // Create InputHandler instance
+        const inputHandler = new InputHandler();
+
+        // Log for pressed events
+        const pressedLog = document.getElementById('pressed-log');
+        let logMessages = [];
+
+        function addLog(message) {
+            logMessages.push(`${new Date().toLocaleTimeString()}: ${message}`);
+            if (logMessages.length > 10) {
+                logMessages.shift();
+            }
+            pressedLog.innerHTML = logMessages.join('<br>');
+        }
+
+        // Update display every frame
+        function update() {
+            // Update key states
+            document.getElementById('left-status').textContent = inputHandler.isLeftDown() ? 'PRESSED' : 'Not Pressed';
+            document.getElementById('right-status').textContent = inputHandler.isRightDown() ? 'PRESSED' : 'Not Pressed';
+            document.getElementById('up-status').textContent = inputHandler.isUpDown() ? 'PRESSED' : 'Not Pressed';
+            document.getElementById('down-status').textContent = inputHandler.isDownDown() ? 'PRESSED' : 'Not Pressed';
+            document.getElementById('space-status').textContent = (inputHandler.isKeyDown(' ') || inputHandler.isKeyDown('Space')) ? 'PRESSED' : 'Not Pressed';
+
+            // Update active class
+            document.getElementById('left').classList.toggle('active', inputHandler.isLeftDown());
+            document.getElementById('right').classList.toggle('active', inputHandler.isRightDown());
+            document.getElementById('up').classList.toggle('active', inputHandler.isUpDown());
+            document.getElementById('down').classList.toggle('active', inputHandler.isDownDown());
+            document.getElementById('space').classList.toggle('active', inputHandler.isKeyDown(' ') || inputHandler.isKeyDown('Space'));
+
+            // Check for just pressed events
+            if (inputHandler.isKeyPressed('ArrowLeft')) addLog('Left Arrow JUST PRESSED');
+            if (inputHandler.isKeyPressed('ArrowRight')) addLog('Right Arrow JUST PRESSED');
+            if (inputHandler.isKeyPressed('ArrowUp')) addLog('Up Arrow JUST PRESSED');
+            if (inputHandler.isKeyPressed('ArrowDown')) addLog('Down Arrow JUST PRESSED');
+            if (inputHandler.isJumpPressed()) addLog('Spacebar JUST PRESSED');
+
+            // Clear pressed state for next frame
+            inputHandler.clearPressed();
+
+            requestAnimationFrame(update);
+        }
+
+        // Start update loop
+        requestAnimationFrame(update);
+
+        console.log('InputHandler test loaded. Press arrow keys and spacebar to test.');
+    </script>
+</body>
+</html>
