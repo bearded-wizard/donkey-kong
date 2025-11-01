@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AABB Collision Detection Test</title>
+    <style>
+        body {
+            font-family: monospace;
+            padding: 20px;
+            background: #1a1a1a;
+            color: #00ff00;
+        }
+        .test {
+            margin: 10px 0;
+            padding: 10px;
+            border: 1px solid #333;
+        }
+        .pass { color: #00ff00; }
+        .fail { color: #ff0000; }
+        h1, h2 { color: #00ccff; }
+        #canvas {
+            border: 1px solid #00ff00;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>AABB Collision Detection Test Suite</h1>
+    <div id="results"></div>
+    <h2>Visual Test</h2>
+    <canvas id="canvas" width="600" height="400"></canvas>
+    <p>Red = Collision detected, Green = No collision</p>
+
+    <script src="js/utils/Constants.js"></script>
+    <script src="js/systems/Physics.js"></script>
+    <script>
+        const results = document.getElementById('results');
+
+        function test(name, condition) {
+            const div = document.createElement('div');
+            div.className = 'test';
+            const status = condition ? '<span class="pass">✓ PASS</span>' : '<span class="fail">✗ FAIL</span>';
+            div.innerHTML = `${status} - ${name}`;
+            results.appendChild(div);
+            return condition;
+        }
+
+        function testAABB() {
+            let passCount = 0;
+            let totalCount = 0;
+
+            // Test 1: Overlapping rectangles
+            totalCount++;
+            const rect1 = { x: 0, y: 0, width: 50, height: 50 };
+            const rect2 = { x: 25, y: 25, width: 50, height: 50 };
+            const result1 = Physics.checkAABB(rect1, rect2);
+            if (test('Overlapping rectangles should collide', result1 && result1.colliding === true)) {
+                passCount++;
+            }
+
+            // Test 2: Penetration depth should be positive
+            totalCount++;
+            if (test('Penetration depth should be positive', result1 && result1.penetrationDepth > 0)) {
+                passCount++;
+            }
+
+            // Test 3: Separated rectangles
+            totalCount++;
+            const rect3 = { x: 0, y: 0, width: 50, height: 50 };
+            const rect4 = { x: 100, y: 100, width: 50, height: 50 };
+            const result2 = Physics.checkAABB(rect3, rect4);
+            if (test('Separated rectangles should not collide', result2 && result2.colliding === false)) {
+                passCount++;
+            }
+
+            // Test 4: Touching rectangles (edge to edge)
+            totalCount++;
+            const rect5 = { x: 0, y: 0, width: 50, height: 50 };
+            const rect6 = { x: 50, y: 0, width: 50, height: 50 };
+            const result3 = Physics.checkAABB(rect5, rect6);
+            if (test('Touching rectangles (edge to edge) should not collide', result3 && result3.colliding === false)) {
+                passCount++;
+            }
+
+            // Test 5: Zero width rectangle
+            totalCount++;
+            const rect7 = { x: 0, y: 0, width: 0, height: 50 };
+            const rect8 = { x: 0, y: 0, width: 50, height: 50 };
+            const result4 = Physics.checkAABB(rect7, rect8);
+            if (test('Zero width rectangle should not collide', result4 && result4.colliding === false)) {
+                passCount++;
+            }
+
+            // Test 6: Zero height rectangle
+            totalCount++;
+            const rect9 = { x: 0, y: 0, width: 50, height: 0 };
+            const rect10 = { x: 0, y: 0, width: 50, height: 50 };
+            const result5 = Physics.checkAABB(rect9, rect10);
+            if (test('Zero height rectangle should not collide', result5 && result5.colliding === false)) {
+                passCount++;
+            }
+
+            // Test 7: Null rectangle
+            totalCount++;
+            const result6 = Physics.checkAABB(null, rect1);
+            if (test('Null rectangle should return null', result6 === null)) {
+                passCount++;
+            }
+
+            // Test 8: Complete overlap (rect2 inside rect1)
+            totalCount++;
+            const rect11 = { x: 0, y: 0, width: 100, height: 100 };
+            const rect12 = { x: 25, y: 25, width: 50, height: 50 };
+            const result7 = Physics.checkAABB(rect11, rect12);
+            if (test('Complete overlap should collide', result7 && result7.colliding === true)) {
+                passCount++;
+            }
+
+            // Test 9: Axis determination
+            totalCount++;
+            const rect13 = { x: 0, y: 0, width: 100, height: 50 };
+            const rect14 = { x: 90, y: 10, width: 50, height: 50 };
+            const result8 = Physics.checkAABB(rect13, rect14);
+            if (test('Axis should be determined correctly', result8 && result8.axis !== null)) {
+                passCount++;
+            }
+
+            // Test 10: Penetration signs
+            totalCount++;
+            const rect15 = { x: 0, y: 0, width: 50, height: 50 };
+            const rect16 = { x: 25, y: 25, width: 50, height: 50 };
+            const result9 = Physics.checkAABB(rect15, rect16);
+            if (test('Penetration should have correct signs',
+                result9 && result9.penetrationX !== 0 && result9.penetrationY !== 0)) {
+                passCount++;
+            }
+
+            // Summary
+            const summary = document.createElement('div');
+            summary.className = 'test';
+            summary.innerHTML = `<h2>Summary: ${passCount}/${totalCount} tests passed</h2>`;
+            results.appendChild(summary);
+        }
+
+        // Visual test
+        function visualTest() {
+            const canvas = document.getElementById('canvas');
+            const ctx = canvas.getContext('2d');
+
+            // Test cases
+            const testCases = [
+                { rect1: { x: 50, y: 50, width: 80, height: 80 }, rect2: { x: 90, y: 90, width: 80, height: 80 } },
+                { rect1: { x: 200, y: 50, width: 80, height: 80 }, rect2: { x: 300, y: 50, width: 80, height: 80 } },
+                { rect1: { x: 400, y: 50, width: 80, height: 80 }, rect2: { x: 420, y: 80, width: 40, height: 40 } },
+                { rect1: { x: 50, y: 200, width: 80, height: 80 }, rect2: { x: 130, y: 200, width: 80, height: 80 } },
+                { rect1: { x: 250, y: 200, width: 80, height: 80 }, rect2: { x: 270, y: 220, width: 40, height: 40 } },
+                { rect1: { x: 400, y: 200, width: 80, height: 80 }, rect2: { x: 500, y: 250, width: 80, height: 80 } }
+            ];
+
+            testCases.forEach(({ rect1, rect2 }) => {
+                const result = Physics.checkAABB(rect1, rect2);
+                const color = result && result.colliding ? 'rgba(255, 0, 0, 0.5)' : 'rgba(0, 255, 0, 0.5)';
+
+                ctx.fillStyle = color;
+                ctx.fillRect(rect1.x, rect1.y, rect1.width, rect1.height);
+                ctx.fillRect(rect2.x, rect2.y, rect2.width, rect2.height);
+
+                ctx.strokeStyle = '#ffffff';
+                ctx.strokeRect(rect1.x, rect1.y, rect1.width, rect1.height);
+                ctx.strokeRect(rect2.x, rect2.y, rect2.width, rect2.height);
+            });
+        }
+
+        // Run tests
+        testAABB();
+        visualTest();
+    </script>
+</body>
+</html>
