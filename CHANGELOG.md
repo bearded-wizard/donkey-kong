@@ -5,6 +5,33 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.15.0] - 2025-11-01
+
+### Added
+- Variable jump height mechanic - players can control jump height by holding or releasing spacebar
+- `JUMP_CUT_MULTIPLIER` constant (0.4) for jump height control when spacebar released early
+- `isJumping` flag to Player class to track when player is in upward jump phase
+- Jump cut logic that reduces upward velocity when spacebar released during jump
+
+### Changed
+- Jump mechanic now supports variable height: tap spacebar for short jump, hold for full jump
+- Jump behavior feels more responsive and arcade-like with precise height control
+
+### Technical Details
+- Basic jump mechanics already implemented (spacebar to jump, ground check, gravity, velocity clamping)
+- Added `isJumping` state flag to track upward phase of jump
+- Jump cut activates when spacebar released during upward movement (velocity.y < 0)
+- Upward velocity multiplied by `JUMP_CUT_MULTIPLIER` (0.4) when jump is cut
+- `isJumping` flag automatically resets when player starts falling (velocity.y >= 0)
+- Jump constants maintained: -400 px/s velocity, 980 px/s² gravity, 500 px/s max fall speed
+- Updated `reset()` method to include `isJumping` flag
+- Checks both ' ' and 'Space' key codes for spacebar input
+- All physics calculations remain frame-independent via deltaTime
+
+### Fixed
+- Jump height now controllable by player input duration
+- Provides precise control for navigating platforms and obstacles
+
 ## [0.14.0] - 2025-11-01
 
 ### Added
@@ -354,6 +381,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Project documentation: README.md
 - Git ignore rules for development environment
 
+[0.15.0]: https://github.com/bearded-wizard/donkey-kong/releases/tag/v0.15.0
 [0.14.0]: https://github.com/bearded-wizard/donkey-kong/releases/tag/v0.14.0
 [0.13.0]: https://github.com/bearded-wizard/donkey-kong/releases/tag/v0.13.0
 [0.12.0]: https://github.com/bearded-wizard/donkey-kong/releases/tag/v0.12.0
