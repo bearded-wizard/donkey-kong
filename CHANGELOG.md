@@ -5,6 +5,61 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.21.0] - 2025-11-01
+
+### Added
+- **Player sprite rendering** with state-based visual animations
+- Four distinct animation states:
+  - **Idle state**: Standing pose with head, body, legs, and eye indicator
+  - **Walk state**: 4-frame animated walk cycle with leg movement and body bobbing
+  - **Jump state**: Mid-air pose with tucked legs
+  - **Climb state**: 2-frame climbing animation with alternating arm positions
+- **Sprite flipping** based on facing direction (left/right)
+  - Uses canvas transforms (translate and scale) for horizontal flipping
+  - `facingDirection = 1`: Right-facing (normal)
+  - `facingDirection = -1`: Left-facing (flipped)
+- Player rendering methods:
+  - `renderIdle()` - Standing still pose
+  - `renderWalk()` - 4-frame walk cycle with animated legs
+  - `renderJump()` - Mid-air jumping pose
+  - `renderClimb()` - 2-frame climb with alternating arms
+- **Animated walk cycle** (4 frames):
+  - Frame 0: Left leg forward, right leg back
+  - Frame 1: Both legs centered (body bobs)
+  - Frame 2: Right leg forward, left leg back
+  - Frame 3: Both legs centered (body bobs)
+- **Animated climb cycle** (2 frames):
+  - Frame 0: Left arm high, right arm low
+  - Frame 1: Right arm high, left arm low
+- Visual character composition using colored rectangles:
+  - Head section (upper 10-35%)
+  - Body/torso (middle 30-80%)
+  - Legs (lower 75-100%)
+  - Arms (sides, visible during climbing)
+  - Eyes (white indicators showing facing direction)
+
+### Changed
+- Player `render()` method completely rewritten for visual animations
+- Now uses canvas save/restore for transform state management
+- Rendering dispatches to state-specific methods based on `animationState`
+- Player visual representation changes dynamically with movement and state
+
+### Technical Details
+- **Frame-based animation**: Uses existing `animationFrame` counter
+- **Animation speed**: 8 FPS (Constants.PLAYER_ANIMATION_FPS)
+- **Proportional rendering**: All body parts scale with player width/height
+- **Canvas transforms**: Proper save/restore to prevent transform leaks
+- **Fallback rendering**: Simple rectangle if state is unrecognized
+- **Procedural rendering**: No sprite assets required (uses colored rectangles)
+- **Performance optimized**: Simple rectangle drawing operations
+- **Future-ready**: Structure supports sprite sheet integration
+
+### Fixed
+- Player now has clear visual feedback for all movement states
+- Facing direction clearly indicated by sprite flipping
+- Walk animation provides smooth visual feedback during movement
+- Climb animation shows clear arm movement on ladders
+
 ## [0.20.0] - 2025-11-01
 
 ### Added
