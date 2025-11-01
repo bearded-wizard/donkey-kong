@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Classic Donkey Kong arcade game reimplemented in HTML5">
+    <meta name="author" content="Donkey Kong Project">
+    <title>Donkey Kong</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="game-container">
+        <canvas id="gameCanvas" width="1280" height="720"></canvas>
+    </div>
+
+    <!-- Utilities -->
+    <script src="js/utils/Vector2D.js"></script>
+    <script src="js/utils/Constants.js"></script>
+
+    <!-- Systems -->
+    <script src="js/systems/InputHandler.js"></script>
+    <script src="js/systems/Renderer.js"></script>
+    <script src="js/systems/Physics.js"></script>
+    <script src="js/systems/CollisionDetector.js"></script>
+    <script src="js/systems/AudioManager.js"></script>
+
+    <!-- Entities -->
+    <script src="js/entities/Platform.js"></script>
+    <script src="js/entities/Ladder.js"></script>
+    <script src="js/entities/Player.js"></script>
+    <script src="js/entities/Barrel.js"></script>
+    <script src="js/entities/DonkeyKong.js"></script>
+    <script src="js/entities/Princess.js"></script>
+    <script src="js/entities/Hammer.js"></script>
+
+    <!-- Level -->
+    <script src="js/level/Level.js"></script>
+
+    <!-- Game State and Main -->
+    <script src="js/GameState.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>
