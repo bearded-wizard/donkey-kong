@@ -30,8 +30,7 @@ class Hammer {
         this.color = '#FFD700'; // Gold color
 
         // Sprite loading
-        // Sprites: Platformer Art Deluxe by Kenney (www.kenney.nl)
-        // License: CC0 (Public Domain) - See assets/sprites/LICENSE-kenney-deluxe.txt
+        // Custom hammer sprite (retro arcade style)
         this.spriteSheet = new Image();
         this.spriteSheet.src = 'assets/sprites/hammer.png';
         this.spriteSheetLoaded = false;
@@ -43,9 +42,9 @@ class Hammer {
             this.spriteSheetLoaded = false;
         };
 
-        // Sprite dimensions (star.png is 70x70 pixels)
-        this.spriteWidth = 70;
-        this.spriteHeight = 70;
+        // Sprite dimensions (hammer.png is 64x64 pixels)
+        this.spriteWidth = 64;
+        this.spriteHeight = 64;
     }
 
     /**
@@ -77,30 +76,37 @@ class Hammer {
                 this.x, renderY, this.width, this.height    // Destination
             );
         } else {
-            // Fallback: star shape
-            renderer.save();
-            ctx.translate(this.x + this.width / 2, renderY + this.height / 2);
+            // Fallback: simple hammer shape
+            const centerX = this.x + this.width / 2;
+            const centerY = renderY + this.height / 2;
 
-            // Draw star
-            ctx.beginPath();
-            for (let i = 0; i < 5; i++) {
-                const angle = (i * 4 * Math.PI) / 5 - Math.PI / 2;
-                const x = Math.cos(angle) * this.width / 2;
-                const y = Math.sin(angle) * this.height / 2;
-                if (i === 0) {
-                    ctx.moveTo(x, y);
-                } else {
-                    ctx.lineTo(x, y);
-                }
-            }
-            ctx.closePath();
-            ctx.fillStyle = this.color;
-            ctx.fill();
-            ctx.strokeStyle = '#FFA500';
+            // Hammer head
+            ctx.fillStyle = '#8B4513';
+            ctx.fillRect(
+                centerX - this.width * 0.4,
+                centerY - this.height * 0.25,
+                this.width * 0.5,
+                this.height * 0.3
+            );
+
+            // Hammer handle
+            ctx.fillStyle = '#D2691E';
+            ctx.fillRect(
+                centerX - this.width * 0.1,
+                centerY - this.height * 0.1,
+                this.width * 0.2,
+                this.height * 0.5
+            );
+
+            // Gold outline for power-up glow
+            ctx.strokeStyle = this.color;
             ctx.lineWidth = 2;
-            ctx.stroke();
-
-            renderer.restore();
+            ctx.strokeRect(
+                centerX - this.width * 0.4,
+                centerY - this.height * 0.25,
+                this.width * 0.5,
+                this.height * 0.3
+            );
         }
     }
 
