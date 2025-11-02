@@ -5,32 +5,136 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.43.0] - 2025-11-02
+## [0.48.0] - 2025-11-02
 
 ### Added
-- **Rules page with game instructions** (issue #127)
+- **How to Play / Rules page with game instructions** (issue #127)
   - Created standalone rules.html with complete HTML structure
-  - Objective section explaining rescue the princess goal
-  - Controls section documenting all keyboard inputs (arrows, spacebar, P/ESC)
-  - Gameplay section with 3 lives system, 180 second time limit, hammer power-up, invincibility
-  - Scoring system section with all 5 point awards (jump: 100, smash: 300, princess: 1000, time: 10/s, climbing: 10/m)
-  - Strategy tips section for players
+  - Objective section: Rescue the princess at the top
+  - Controls section: Arrow keys, climbing, jumping
+  - Gameplay section: Lives system, time limit, avoid barrels
+  - Scoring section: Points breakdown (jumps, completion, bonuses)
   - Link back to main game with styled arcade button
-  - Reuses page content CSS styling from about.html
+  - Comprehensive CSS styling matching retro aesthetic
   - Responsive design across all breakpoints (≤768px, ≤480px)
   - Proper meta tags and page title
 
 ### Technical Details
-- All game values accurately referenced from Constants.js
-- Controls: Arrow keys (movement/climbing), Spacebar (jump), P/ESC (pause)
-- Lives: 3 starting lives (PLAYER_STARTING_LIVES)
-- Time limit: 180 seconds (LEVEL_TIME_LIMIT)
-- Invincibility: 2 seconds after hit (INVINCIBILITY_DURATION)
-- Scoring: 100 barrel jump, 300 barrel smash, 1000 princess, 10/s time bonus, 10/m climbing
-- Hammer duration: 10 seconds (HAMMER_DURATION)
-- Reuses .page-content, .section-title, .content-text CSS classes
+- Reuses .page-content wrapper and section styling from styles.css
+- Section titles with red glow effect matching game aesthetic
+- Content organized with bullet lists for easy scanning
+- Accurate game values from Constants.js (3 lives, 180s limit)
+- Scoring breakdown: 100 pts/barrel, 1000 pts completion, 10 pts/s time bonus
+- Back button styled as arcade-style button with red background
+- Responsive typography matching other pages
+- Maintains retro arcade aesthetic throughout
+- Reuses header and footer components from index.html
+
+## [0.47.0] - 2025-11-02
+
+### Added
+- **About page with credits and attribution** (issue #126)
+  - Created standalone about.html with complete HTML structure
+  - About the Game section describing Barrel Blaster and educational purpose
+  - Credits section with developer and repository information
+  - Prominent Asset Attribution section for Kenney sprites
+  - Technology section listing vanilla JavaScript and HTML5 Canvas
+  - Educational Purpose disclaimer about Donkey Kong clone status
+  - Link back to main game with styled arcade button
+  - Comprehensive CSS styling for page content in styles.css
+  - Responsive design across all breakpoints (≤768px, ≤480px)
+  - Proper meta tags and page title
+
+### Technical Details
+- Page content styled with .page-content wrapper (max-width: 900px)
+- Section titles with red glow effect (#ff0000) matching game aesthetic
+- Content links in cyan (#00ffff) with hover glow effect
+- Kenney attribution prominently displayed in larger cyan text
+- Back button styled as arcade-style button with red background
+- Responsive typography: 24px → 20px → 18px for section titles
+- Content text: 16px → 14px → 13px responsive sizing
+- Attribution text: 20px → 18px → 16px prominent sizing
+- Reuses existing header and footer components from index.html
+- Maintains retro arcade aesthetic consistent with main game
+
+## [0.46.0] - 2025-11-02
+
+### Added
+- **Footer styling with pixel art accents** (issue #125)
+  - Enhanced game footer with retro arcade aesthetic
+  - Pixel art corner accents (16x16 red squares in bottom corners)
+  - Pixel art divider after navigation links using cyan gradient pattern
+  - Border and background styling matching header design
+  - Enhanced link hover effects with borders, glow, and background
+  - Red separator pipes matching accent color scheme
+  - Responsive sizing for all breakpoints (≤1400px, ≤768px, ≤480px)
+  - Improved copyright text styling with subtle glow effect
+
+### Technical Details
+- Footer border: 4px solid #ff0000 with inset shadow
+- Background: #0a0a0a matching header depth effect
+- Corner accents: Positioned at bottom corners with nested box-shadows
+- Divider pattern: Linear gradient creating dotted pixel effect (200px wide, cyan #00ffff)
+- Link hover states: Border (#00ffff), background (rgba(0,255,255,0.1)), glow shadow
+- Link padding: 8px 12px for better touch targets
+- Responsive corner sizes: 16px → 12px → 8px
+- Responsive divider width: 200px → 150px → 120px
+- Maximum width: 1280px matching header and game canvas
+- Separator color: #ff0000 (bold) for visual accent
+
+## [0.45.0] - 2025-11-02
+
+### Added
+- **Header styling with pixel art accents** (issue #124)
+  - Enhanced game header with retro arcade aesthetic
+  - Pixel art corner accents (16x16 red squares in top corners)
+  - Pixel art divider between title and tagline using gradient pattern
+  - Border and background styling matching game container design
+  - Box shadow with red glow effect for CRT monitor feel
+  - Responsive sizing for all breakpoints (≤1400px, ≤768px, ≤480px)
+  - Enhanced visual hierarchy with proper spacing
+
+### Technical Details
+- Header border: 4px solid #ff0000 with inset shadow
+- Background: #0a0a0a with depth effect
+- Corner accents: Positioned absolutely with nested box-shadows
+- Divider pattern: Linear gradient creating dotted pixel effect (200px wide)
+- Responsive corner sizes: 16px → 12px → 8px
+- Responsive divider width: 200px → 150px → 120px
+- Maximum width: 1280px matching game canvas
+- Maintains monospace font family ('Courier New')
+- Text shadows preserved: red glow for title, cyan for tagline
+
+## [0.44.0] - 2025-11-02
+
+### Added
+- **License page with legal information** (issue #128)
+  - Created standalone license.html with complete HTML structure
+  - Code License section with full MIT License text
+  - Asset Licenses section for Kenney sprite packs
+  - Clear separation between code (MIT) and assets (CC0)
+  - Copyright notice: © 2025 Donkey Kong Project Contributors
+  - Full MIT License text with plain English explanation
+  - Full CC0 License text for Kenney assets
+  - Links to official license texts (opensource.org, creativecommons.org)
+  - License summary section with last updated date
+  - License-specific CSS styling (license boxes, subsections)
+  - Link back to main game with styled arcade button
+  - Responsive design across all breakpoints (≤768px, ≤480px)
+  - Proper meta tags and page title
+
+### Technical Details
+- License boxes styled with dark background (#0a0a0a) and red border accent
+- Code license: MIT License for Barrel Blaster source code
+- Asset license: CC0 Public Domain for Kenney sprite packs
+- Subsection titles in cyan (#00ffff) with glow effect
+- License text in readable gray (#aaaaaa) with increased line height (1.7)
+- Responsive license boxes: 20px → 15px → 12px padding
+- Links to Kenney.nl and official license documentation
+- "What this means" sections for non-lawyers
+- Last updated: November 2, 2025
 - Semantic HTML5 structure with header, sections, and footer
-- Arcade-style instructional language for retro feel
+- Extends page content CSS with license-specific classes
 
 ## [0.41.0] - 2025-11-02
 

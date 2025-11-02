@@ -20,8 +20,39 @@ body {
 /* === Header === */
 .game-header {
     text-align: center;
-    padding: 20px;
-    margin-top: 20px;
+    padding: 30px 20px;
+    margin: 20px auto;
+    max-width: 1280px;
+    position: relative;
+    background-color: #0a0a0a;
+    border: 4px solid #ff0000;
+    border-radius: 4px;
+    box-shadow: 0 0 15px rgba(255, 0, 0, 0.4),
+                inset 0 0 20px rgba(0, 0, 0, 0.9);
+}
+
+/* Pixel art corner accents */
+.game-header::before,
+.game-header::after {
+    content: '';
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    background-color: #ff0000;
+    box-shadow:
+        0 0 0 2px #000,
+        0 0 0 4px #ff0000,
+        0 0 10px rgba(255, 0, 0, 0.6);
+}
+
+.game-header::before {
+    top: -2px;
+    left: -2px;
+}
+
+.game-header::after {
+    top: -2px;
+    right: -2px;
 }
 
 .game-title {
@@ -29,16 +60,49 @@ body {
     font-weight: bold;
     color: #ff0000;
     margin: 0;
+    padding-bottom: 15px;
     text-shadow: 0 0 10px rgba(255, 0, 0, 0.8),
                  0 0 20px rgba(255, 0, 0, 0.5);
     letter-spacing: 4px;
+    position: relative;
+}
+
+/* Pixel art divider between title and tagline */
+.game-title::after {
+    content: '';
+    display: block;
+    width: 200px;
+    height: 4px;
+    background:
+        linear-gradient(90deg,
+            transparent 0%,
+            transparent 10%,
+            #ff0000 10%,
+            #ff0000 20%,
+            transparent 20%,
+            transparent 30%,
+            #ff0000 30%,
+            #ff0000 40%,
+            transparent 40%,
+            transparent 60%,
+            #ff0000 60%,
+            #ff0000 70%,
+            transparent 70%,
+            transparent 80%,
+            #ff0000 80%,
+            #ff0000 90%,
+            transparent 90%,
+            transparent 100%
+        );
+    margin: 15px auto 0;
+    box-shadow: 0 0 8px rgba(255, 0, 0, 0.5);
 }
 
 .game-tagline {
     font-size: 18px;
     font-weight: normal;
     color: #00ffff;
-    margin: 10px 0 0 0;
+    margin: 15px 0 0 0;
     text-shadow: 0 0 5px rgba(0, 255, 255, 0.6);
     letter-spacing: 2px;
 }
@@ -76,13 +140,77 @@ body {
 /* === Footer === */
 .game-footer {
     text-align: center;
-    padding: 20px;
+    padding: 30px 20px;
+    margin: 20px auto;
     margin-bottom: 20px;
-    color: #888888;
+    max-width: 1280px;
+    position: relative;
+    background-color: #0a0a0a;
+    border: 4px solid #ff0000;
+    border-radius: 4px;
+    box-shadow: 0 0 15px rgba(255, 0, 0, 0.4),
+                inset 0 0 20px rgba(0, 0, 0, 0.9);
+}
+
+/* Pixel art corner accents for footer */
+.game-footer::before,
+.game-footer::after {
+    content: '';
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    background-color: #ff0000;
+    box-shadow:
+        0 0 0 2px #000,
+        0 0 0 4px #ff0000,
+        0 0 10px rgba(255, 0, 0, 0.6);
+}
+
+.game-footer::before {
+    bottom: -2px;
+    left: -2px;
+}
+
+.game-footer::after {
+    bottom: -2px;
+    right: -2px;
 }
 
 .footer-nav {
-    margin-bottom: 10px;
+    margin-bottom: 15px;
+    position: relative;
+    padding-bottom: 15px;
+}
+
+/* Pixel art divider after navigation */
+.footer-nav::after {
+    content: '';
+    display: block;
+    width: 200px;
+    height: 4px;
+    background:
+        linear-gradient(90deg,
+            transparent 0%,
+            transparent 10%,
+            #00ffff 10%,
+            #00ffff 20%,
+            transparent 20%,
+            transparent 30%,
+            #00ffff 30%,
+            #00ffff 40%,
+            transparent 40%,
+            transparent 60%,
+            #00ffff 60%,
+            #00ffff 70%,
+            transparent 70%,
+            transparent 80%,
+            #00ffff 80%,
+            #00ffff 90%,
+            transparent 90%,
+            transparent 100%
+        );
+    margin: 15px auto 0;
+    box-shadow: 0 0 8px rgba(0, 255, 255, 0.5);
 }
 
 .footer-link {
@@ -90,25 +218,34 @@ body {
     text-decoration: none;
     font-size: 14px;
     letter-spacing: 1px;
-    transition: color 0.3s ease, text-shadow 0.3s ease;
+    padding: 8px 12px;
+    display: inline-block;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+    border-radius: 2px;
 }
 
 .footer-link:hover {
     color: #ffffff;
     text-shadow: 0 0 8px rgba(0, 255, 255, 0.8);
+    border-color: #00ffff;
+    background-color: rgba(0, 255, 255, 0.1);
+    box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
 }
 
 .footer-separator {
-    color: #555555;
-    margin: 0 10px;
+    color: #ff0000;
+    margin: 0 5px;
     font-size: 14px;
+    font-weight: bold;
 }
 
 .footer-copyright {
     font-size: 12px;
-    color: #666666;
-    margin: 10px 0 0 0;
+    color: #888888;
+    margin: 15px 0 0 0;
     letter-spacing: 1px;
+    text-shadow: 0 0 3px rgba(255, 255, 255, 0.3);
 }
 
 /* === Responsive Design === */
@@ -140,14 +277,26 @@ body {
         letter-spacing: 3px;
     }
 
+    .game-title::after {
+        width: 150px;
+        height: 3px;
+    }
+
     .game-tagline {
         font-size: 16px;
         letter-spacing: 1px;
     }
 
     .game-header {
-        padding: 15px;
-        margin-top: 10px;
+        padding: 25px 15px;
+        margin: 15px 10px;
+        border-width: 3px;
+    }
+
+    .game-header::before,
+    .game-header::after {
+        width: 12px;
+        height: 12px;
     }
 
     .footer-link {
@@ -164,8 +313,21 @@ body {
     }
 
     .game-footer {
-        padding: 15px;
+        padding: 25px 15px;
+        margin: 15px 10px;
         margin-bottom: 15px;
+        border-width: 3px;
+    }
+
+    .game-footer::before,
+    .game-footer::after {
+        width: 12px;
+        height: 12px;
+    }
+
+    .footer-nav::after {
+        width: 150px;
+        height: 3px;
     }
 }
 
@@ -180,14 +342,26 @@ body {
         letter-spacing: 2px;
     }
 
+    .game-title::after {
+        width: 120px;
+        height: 2px;
+    }
+
     .game-tagline {
         font-size: 14px;
         letter-spacing: 1px;
     }
 
     .game-header {
-        padding: 10px;
-        margin-top: 5px;
+        padding: 20px 10px;
+        margin: 10px 5px;
+        border-width: 2px;
+    }
+
+    .game-header::before,
+    .game-header::after {
+        width: 8px;
+        height: 8px;
     }
 
     .footer-nav {
@@ -210,8 +384,21 @@ body {
     }
 
     .game-footer {
-        padding: 10px;
+        padding: 20px 10px;
+        margin: 10px 5px;
         margin-bottom: 10px;
+        border-width: 2px;
+    }
+
+    .game-footer::before,
+    .game-footer::after {
+        width: 8px;
+        height: 8px;
+    }
+
+    .footer-nav::after {
+        width: 120px;
+        height: 2px;
     }
 }
 
@@ -256,4 +443,198 @@ body {
 
 #game-container {
     animation: glow 3s ease-in-out infinite;
+}
+
+/* === Page Content Styling === */
+.page-content {
+    width: 100%;
+    max-width: 900px;
+    padding: 40px;
+    color: #ffffff;
+    line-height: 1.6;
+}
+
+.content-section {
+    margin-bottom: 30px;
+}
+
+.section-title {
+    font-size: 24px;
+    color: #ff0000;
+    margin-bottom: 15px;
+    text-shadow: 0 0 8px rgba(255, 0, 0, 0.6);
+    letter-spacing: 2px;
+    border-bottom: 2px solid #ff0000;
+    padding-bottom: 8px;
+}
+
+.content-text {
+    font-size: 16px;
+    color: #cccccc;
+    margin-bottom: 15px;
+    letter-spacing: 0.5px;
+}
+
+.content-text strong {
+    color: #ffffff;
+}
+
+.content-link {
+    color: #00ffff;
+    text-decoration: none;
+    transition: color 0.3s ease, text-shadow 0.3s ease;
+}
+
+.content-link:hover {
+    color: #ffffff;
+    text-shadow: 0 0 8px rgba(0, 255, 255, 0.8);
+}
+
+.content-list {
+    list-style-type: square;
+    margin-left: 30px;
+    margin-bottom: 15px;
+    color: #cccccc;
+}
+
+.content-list li {
+    margin-bottom: 8px;
+}
+
+.attribution-prominent {
+    font-size: 20px;
+    color: #00ffff;
+    text-shadow: 0 0 8px rgba(0, 255, 255, 0.6);
+    margin-bottom: 10px;
+}
+
+.center-text {
+    text-align: center;
+    margin-top: 30px;
+}
+
+.back-link {
+    display: inline-block;
+    padding: 12px 24px;
+    background-color: #ff0000;
+    color: #ffffff;
+    text-decoration: none;
+    font-size: 16px;
+    font-weight: bold;
+    letter-spacing: 1px;
+    border: 2px solid #ff0000;
+    transition: all 0.3s ease;
+}
+
+.back-link:hover {
+    background-color: #000000;
+    border-color: #ffffff;
+    box-shadow: 0 0 10px rgba(255, 0, 0, 0.8);
+}
+
+/* === License Page Specific === */
+.license-box {
+    background-color: #0a0a0a;
+    border: 2px solid #555555;
+    border-left: 4px solid #ff0000;
+    padding: 20px;
+    margin: 20px 0;
+    border-radius: 4px;
+}
+
+.license-text {
+    font-size: 14px;
+    color: #aaaaaa;
+    margin-bottom: 12px;
+    line-height: 1.7;
+}
+
+.license-subsection {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid #333333;
+}
+
+.subsection-title {
+    font-size: 20px;
+    color: #00ffff;
+    margin-bottom: 12px;
+    text-shadow: 0 0 5px rgba(0, 255, 255, 0.5);
+    letter-spacing: 1px;
+}
+
+/* === Responsive Page Content === */
+@media screen and (max-width: 768px) {
+    .page-content {
+        padding: 30px 20px;
+    }
+
+    .section-title {
+        font-size: 20px;
+    }
+
+    .content-text {
+        font-size: 14px;
+    }
+
+    .attribution-prominent {
+        font-size: 18px;
+    }
+
+    .back-link {
+        padding: 10px 20px;
+        font-size: 14px;
+    }
+
+    .license-box {
+        padding: 15px;
+    }
+
+    .license-text {
+        font-size: 13px;
+    }
+
+    .subsection-title {
+        font-size: 18px;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .page-content {
+        padding: 20px 15px;
+    }
+
+    .section-title {
+        font-size: 18px;
+        letter-spacing: 1px;
+    }
+
+    .content-text {
+        font-size: 13px;
+    }
+
+    .attribution-prominent {
+        font-size: 16px;
+    }
+
+    .content-list {
+        margin-left: 20px;
+    }
+
+    .back-link {
+        padding: 8px 16px;
+        font-size: 13px;
+    }
+
+    .license-box {
+        padding: 12px;
+    }
+
+    .license-text {
+        font-size: 12px;
+    }
+
+    .subsection-title {
+        font-size: 16px;
+    }
 }
