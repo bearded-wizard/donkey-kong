@@ -5,6 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.40.0] - 2025-11-02
+
+### Added
+- **Game header with title and tagline** (issue #122)
+  - Added semantic `<header>` element with game branding
+  - Game title "Barrel Blaster" in h1 tag with red glow effect
+  - Tagline "A Classic Donkey Kong Clone" in h2 tag with cyan glow
+  - CSS styling matching retro arcade aesthetic
+  - Responsive typography for tablet (≤768px) and mobile (≤480px)
+  - Proper semantic HTML5 structure with heading hierarchy
+
+### Technical Details
+- Header positioned above game canvas using flex-column layout
+- Title styling: Red (#ff0000) with glowing text-shadow, 48px → 36px → 28px
+- Tagline styling: Cyan (#00ffff) with glowing text-shadow, 18px → 16px → 14px
+- Letter-spacing for arcade-style typography (4px → 3px → 2px for title)
+- Color coordination with game-container border and ladder colors
+
 ## [0.39.0] - 2025-11-02
 
 ### Changed
