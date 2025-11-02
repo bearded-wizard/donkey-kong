@@ -5,6 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.39.0] - 2025-11-02
+
+### Changed
+- **Body layout CSS refactored for header/footer support** (issue #121)
+  - Changed body display from centered to flex-column for vertical stacking
+  - Added `flex-direction: column` to enable header/game/footer layout
+  - Changed overflow from `hidden` to `overflow-x: hidden; overflow-y: auto`
+  - Added `margin: 20px 0` to game-container for proper spacing
+  - Maintained `align-items: center` for horizontal centering
+  - Preserved all responsive breakpoints (1400px, 768px, 480px)
+  - Preserved scanline overlay and CRT glow effects
+
+### Technical Details
+- Foundational layout change to support page structure improvements
+- Enables vertical stacking of header, game canvas, and footer
+- All existing styling and retro arcade aesthetic maintained
+- Clean flexbox implementation following CSS best practices
+
 ## [0.38.0] - 2025-11-02
 
 ### Added
