@@ -12,6 +12,10 @@
 	   - antagonist-walk.png (96x96 idle animation)
 	   - antagonist-throw.png (96x96 throwing action)
 
+	3. Simplified Platformer Pack (Princess sprites)
+	   - character_pink_idle.png (128x128 idle stance)
+	   - character_pink_front.png (128x128 front view)
+
 	by  Kenney Vleugels (Kenney.nl)
 
 			------------------------------

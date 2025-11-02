@@ -112,13 +112,20 @@ const Constants = {
     // PRINCESS CONSTANTS
     // ===========================
 
-    // Princess dimensions
-    PRINCESS_WIDTH: 32,
+    // Princess dimensions (Simplified Platformer Pack - 96x96 pixels)
+    PRINCESS_WIDTH: 48,
     PRINCESS_HEIGHT: 48,
 
     // Princess position (top platform, next to DK)
     PRINCESS_X: 1100,
-    PRINCESS_Y: 80,
+    PRINCESS_Y: 92,
+
+    // Princess animation frame rate (frames per second)
+    PRINCESS_ANIMATION_FPS: 4,
+
+    // Princess sprite paths (Simplified Platformer Pack)
+    PRINCESS_SPRITE_IDLE: 'assets/sprites/princess/character_pink_idle.png',
+    PRINCESS_SPRITE_FRONT: 'assets/sprites/princess/character_pink_front.png',
 
     // ===========================
     // PLATFORM CONSTANTS

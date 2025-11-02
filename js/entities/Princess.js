@@ -12,43 +12,61 @@ class Princess {
      * @param {number} y - Y position
      */
     constructor(x, y) {
-        // Position
+        // Position - use constants
         this.x = x;
         this.y = y;
-        this.width = 40;
-        this.height = 50;
+        this.width = Constants.PRINCESS_WIDTH;
+        this.height = Constants.PRINCESS_HEIGHT;
 
         // Animation
         this.animationFrame = 0;
         this.animationTimer = 0;
-        this.animationFPS = 2; // Slow idle animation
+        this.animationFPS = Constants.PRINCESS_ANIMATION_FPS;
 
         // Color fallback
         this.color = '#FF69B4'; // Pink color
 
-        // Sprite loading
-        // Sprites: Platformer Characters Pack by Kenney (www.kenney.nl)
+        // Sprite loading (Simplified Platformer Pack)
+        // Sprites: Simplified Platformer Pack by Kenney (www.kenney.nl)
         // License: CC0 (Public Domain) - See assets/sprites/LICENSE-kenney.txt
-        this.spriteSheet = new Image();
-        this.spriteSheet.src = 'assets/sprites/princess.png';
-        this.spriteSheetLoaded = false;
-        this.spriteSheet.onload = () => {
-            this.spriteSheetLoaded = true;
+        this.sprites = {
+            idle: new Image(),
+            front: new Image()
         };
-        this.spriteSheet.onerror = () => {
-            console.warn('Failed to load princess sprite, using fallback rendering');
-            this.spriteSheetLoaded = false;
+        this.sprites.idle.src = Constants.PRINCESS_SPRITE_IDLE;
+        this.sprites.front.src = Constants.PRINCESS_SPRITE_FRONT;
+
+        // Track loading state for each sprite
+        this.spritesLoaded = {
+            idle: false,
+            front: false
+        };
+        this.sprites.idle.onload = () => {
+            this.spritesLoaded.idle = true;
+        };
+        this.sprites.front.onload = () => {
+            this.spritesLoaded.front = true;
         };
 
-        // Sprite configuration (same as player - 80x110 pixels, 9 columns)
-        this.spriteWidth = 80;
-        this.spriteHeight = 110;
+        // Error handling for sprite loading
+        this.sprites.idle.onerror = () => {
+            console.warn('Failed to load princess idle sprite, using fallback rendering');
+            this.spritesLoaded.idle = false;
+        };
+        this.sprites.front.onerror = () => {
+            console.warn('Failed to load princess front sprite, using fallback rendering');
+            this.spritesLoaded.front = false;
+        };
 
-        // Princess uses idle animation from female character
+        // Sprite configuration (Simplified Pack - 128x128 pixels)
+        this.spriteWidth = 128;
+        this.spriteHeight = 128;
+
+        // Princess animation configuration using individual sprites
         this.spriteConfig = {
             idle: [
-                { x: 0, y: 0 },  // Standing
-                { x: 1, y: 0 }   // Slight movement
+                { sprite: 'idle' },   // Idle stance
+                { sprite: 'front' }   // Alternating with front view
             ]
         };
     }
@@ -75,22 +93,30 @@ class Princess {
     render(renderer) {
         const ctx = renderer.getContext();
 
-        if (this.spriteSheetLoaded) {
-            // Get current sprite frame
-            const sprites = this.spriteConfig.idle;
-            const frameIndex = this.animationFrame % sprites.length;
-            const sprite = sprites[frameIndex];
+        // Get current sprite frame
+        const sprites = this.spriteConfig.idle;
+        const frameIndex = this.animationFrame % sprites.length;
+        const spriteConfig = sprites[frameIndex];
+        const spriteName = spriteConfig.sprite;
 
-            // Calculate source position
-            const srcX = sprite.x * this.spriteWidth;
-            const srcY = sprite.y * this.spriteHeight;
+        // Check if this specific sprite is loaded and ready to draw
+        const spriteImage = this.sprites[spriteName];
+        const spriteLoaded = this.spritesLoaded[spriteName];
+        const imageReady = spriteImage && spriteImage.complete && spriteImage.naturalWidth > 0;
 
-            // Draw sprite
+        if (spriteLoaded && imageReady) {
+            // Save context state
+            ctx.save();
+
+            // Draw full sprite image scaled to display size
             ctx.drawImage(
-                this.spriteSheet,
-                srcX, srcY, this.spriteWidth, this.spriteHeight,  // Source
-                this.x, this.y, this.width, this.height            // Destination
+                spriteImage,
+                0, 0, this.spriteWidth, this.spriteHeight,  // Source (full 128x128 sprite)
+                this.x, this.y, this.width, this.height      // Destination (scaled to display size)
             );
+
+            // Restore context state
+            ctx.restore();
         } else {
             // Fallback: simple princess representation
             // Dress
