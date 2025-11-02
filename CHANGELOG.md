@@ -5,6 +5,49 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.38.0] - 2025-11-02
+
+### Added
+- **Upgraded princess sprites to Kenney Platformer Pack** (Princess.js)
+  - Replaced basic sprite with high-quality 128×128 Kenney Platformer Pack princess
+  - Character: Pink variant from Kenney's Platformer Characters Pack
+  - Multi-sprite loading system with two distinct sprite states:
+    - `character_pink_idle.png` - Standing pose with hands together
+    - `character_pink_front.png` - Forward-facing pose with welcoming stance
+  - 4 FPS animation alternating between idle and front states
+  - Sprite loading with per-sprite state tracking (isLoaded, hasError)
+  - Image readiness validation (complete and naturalWidth checks)
+  - Graceful fallback rendering when sprites fail to load
+- **Princess sprite configuration**
+  - Sprite dimensions: 128×128 source, scaled to 48×48 display
+  - Updated PRINCESS_WIDTH and PRINCESS_HEIGHT constants (48×48)
+  - Added sprite path constants (PRINCESS_SPRITE_IDLE, PRINCESS_SPRITE_FRONT)
+  - Improved Y position alignment (92px) for proper platform positioning
+  - Enhanced sprite rendering system with error handling
+- **Updated sprite attribution** (assets/sprites/LICENSE-kenney.txt)
+  - Princess sprites credited (Platformer Characters Pack)
+  - Character: character_pink_idle and character_pink_front
+  - CC0 licensed by Kenney (www.kenney.nl)
+
+### Changed
+- **Princess sprite system refactor**
+  - Changed from single sprite to multiple individual PNG files
+  - Sprite dimensions: variable → 128×128 (source), 48×48 (display)
+  - Implemented separate Image objects for each sprite type
+  - Enhanced loading state tracking with sprite-specific status
+  - Added animation configuration switching between sprite files
+  - Updated rendering to use current animation state sprite
+  - Added `ctx.save()`/`ctx.restore()` for proper canvas state management
+
+### Technical Details
+- Princess now uses modern, high-quality Kenney sprite pack
+- Consistent art style with protagonist and antagonist sprites
+- Improved visual presentation maintains retro arcade aesthetic
+- All sprites properly licensed under CC0 (public domain)
+- Sprite loading uses async Image() objects with onload/onerror handlers
+- Fallback rendering preserved for graceful degradation
+- Animation cycles at 4 FPS for gentle, welcoming character movement
+
 ## [0.37.1] - 2025-11-02
 
 ### Added
