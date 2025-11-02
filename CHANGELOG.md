@@ -5,6 +5,39 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.37.0] - 2025-11-02
+
+### Added
+- **Comprehensive README documentation** (issue #45)
+  - Table of Contents with 11 major sections
+  - How to Play section with objective, getting started guide, winning conditions, and game over scenarios
+  - Controls documentation with professional table format and control tips
+  - Complete scoring system breakdown (5 scoring actions with point values)
+  - Game mechanics documentation (8 subsections covering all systems)
+  - Screenshot placeholder with setup instructions
+  - Installation and system requirements
+  - Development setup guide with server options and workflow
+  - Complete project structure file tree (40+ files documented)
+  - Technical details section (architecture, systems, constants, coordinates, performance, compatibility)
+  - Contributing guidelines with bug reports, feature requests, PR process, and 13 review criteria
+  - License information (MIT summary with permissions)
+  - Credits section (game design, sprites, audio, development, thanks)
+
+### Documentation
+- Expanded README from 162 to 668 lines with professional structure
+- All 11 acceptance criteria from issue #45 met
+- Accurate cross-references with Constants.js for all game values
+- Developer-friendly code examples and architecture guide
+- Player-friendly how-to-play, controls, and scoring guides
+- Industry-standard README patterns with clear formatting
+
+### Technical Details
+- Documentation verified against Constants.js for accuracy
+- Professional markdown formatting with tables, code blocks, and clear sections
+- Created `assets/screenshots/README.md` for screenshot instructions
+- All documentation values match game code exactly
+- Comprehensive coverage of game systems, features, and technical architecture
+
 ## [0.36.0] - 2025-11-02
 
 ### Added
