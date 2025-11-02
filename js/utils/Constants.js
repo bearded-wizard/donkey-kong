@@ -166,6 +166,7 @@ const Constants = {
     POINTS_BARREL_JUMP: 100,
     POINTS_REACH_PRINCESS: 1000,
     POINTS_TIME_BONUS: 10, // per second remaining
+    POINTS_CLIMBING_PER_METER: 10, // 10 points per meter climbed
 
     // ===========================
     // GAME TIMING CONSTANTS

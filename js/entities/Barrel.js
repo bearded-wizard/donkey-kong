@@ -28,6 +28,7 @@ class Barrel {
         this.isAlive = true;
         this.isOnLadder = false; // Issue #24: Barrel ladder detection
         this.currentLadder = null; // Track which ladder barrel is on
+        this.jumpedOver = false; // Issue #38: Track if player jumped over this barrel
 
         // Physics object for compatibility with Physics class
         this.position = { x: this.x, y: this.y };
