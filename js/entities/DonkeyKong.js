@@ -32,33 +32,61 @@ class DonkeyKong {
         // Color fallback
         this.color = '#8B4513'; // Brown color
 
-        // Sprite loading
-        // Sprites: Platformer Characters Pack by Kenney (www.kenney.nl)
+        // Sprite loading (Simplified Platformer Pack)
+        // Sprites: Simplified Platformer Pack by Kenney (www.kenney.nl)
         // License: CC0 (Public Domain) - See assets/sprites/LICENSE-kenney.txt
-        this.spriteSheet = new Image();
-        this.spriteSheet.src = 'assets/sprites/kong.png';
-        this.spriteSheetLoaded = false;
-        this.spriteSheet.onload = () => {
-            this.spriteSheetLoaded = true;
+        this.sprites = {
+            happy: new Image(),
+            walk: new Image(),
+            throw: new Image()
         };
-        this.spriteSheet.onerror = () => {
-            console.warn('Failed to load kong sprite, using fallback rendering');
-            this.spriteSheetLoaded = false;
+        this.sprites.happy.src = 'assets/sprites/antagonist-happy.png';
+        this.sprites.walk.src = 'assets/sprites/antagonist-walk.png';
+        this.sprites.throw.src = 'assets/sprites/antagonist-throw.png';
+
+        // Track loading state for each sprite
+        this.spritesLoaded = {
+            happy: false,
+            walk: false,
+            throw: false
+        };
+        this.sprites.happy.onload = () => {
+            this.spritesLoaded.happy = true;
+        };
+        this.sprites.walk.onload = () => {
+            this.spritesLoaded.walk = true;
+        };
+        this.sprites.throw.onload = () => {
+            this.spritesLoaded.throw = true;
         };
 
-        // Sprite configuration (same as player - 80x110 pixels, 9 columns)
-        this.spriteWidth = 80;
-        this.spriteHeight = 110;
+        // Error handling for sprite loading
+        this.sprites.happy.onerror = () => {
+            console.warn('Failed to load antagonist happy sprite, using fallback rendering');
+            this.spritesLoaded.happy = false;
+        };
+        this.sprites.walk.onerror = () => {
+            console.warn('Failed to load antagonist walk sprite, using fallback rendering');
+            this.spritesLoaded.walk = false;
+        };
+        this.sprites.throw.onerror = () => {
+            console.warn('Failed to load antagonist throw sprite, using fallback rendering');
+            this.spritesLoaded.throw = false;
+        };
 
-        // Kong uses zombie character animations
+        // Sprite configuration (Simplified Pack - 96x96 pixels)
+        this.spriteWidth = 96;
+        this.spriteHeight = 96;
+
+        // Antagonist animation configuration using individual sprites
         this.spriteConfig = {
             idle: [
-                { x: 0, y: 0 },  // Standing
-                { x: 1, y: 0 }   // Idle animation
+                { sprite: 'happy' },  // Menacing stance with personality
+                { sprite: 'walk' }    // Subtle movement for living idle
             ],
             throw: [
-                { x: 2, y: 0 },  // Throwing pose
-                { x: 3, y: 0 }   // Follow-through
+                { sprite: 'throw' },  // Dynamic throwing action
+                { sprite: 'happy' }   // Return to menacing stance
             ]
         };
     }
@@ -119,22 +147,30 @@ class DonkeyKong {
     render(renderer) {
         const ctx = renderer.getContext();
 
-        if (this.spriteSheetLoaded) {
-            // Choose sprite based on animation state (issue #29)
-            const sprites = this.animationState === 'throw' ? this.spriteConfig.throw : this.spriteConfig.idle;
-            const frameIndex = this.animationFrame % sprites.length;
-            const sprite = sprites[frameIndex];
+        // Choose sprite based on animation state (issue #29)
+        const sprites = this.animationState === 'throw' ? this.spriteConfig.throw : this.spriteConfig.idle;
+        const frameIndex = this.animationFrame % sprites.length;
+        const spriteConfig = sprites[frameIndex];
+        const spriteName = spriteConfig.sprite;
 
-            // Calculate source position
-            const srcX = sprite.x * this.spriteWidth;
-            const srcY = sprite.y * this.spriteHeight;
+        // Check if this specific sprite is loaded and ready to draw
+        const spriteImage = this.sprites[spriteName];
+        const spriteLoaded = this.spritesLoaded[spriteName];
+        const imageReady = spriteImage && spriteImage.complete && spriteImage.naturalWidth > 0;
 
-            // Draw sprite
+        if (spriteLoaded && imageReady) {
+            // Save context state
+            ctx.save();
+
+            // Draw full sprite image scaled to display size
             ctx.drawImage(
-                this.spriteSheet,
-                srcX, srcY, this.spriteWidth, this.spriteHeight,  // Source
-                this.x, this.y, this.width, this.height            // Destination
+                spriteImage,
+                0, 0, this.spriteWidth, this.spriteHeight,  // Source (full 96x96 sprite)
+                this.x, this.y, this.width, this.height      // Destination (scaled to 60x60)
             );
+
+            // Restore context state
+            ctx.restore();
         } else {
             // Fallback: simple kong representation
             // Body

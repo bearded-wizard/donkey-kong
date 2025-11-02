@@ -63,14 +63,14 @@ class Player {
         this.velocity = { x: this.velocityX, y: this.velocityY };
 
         // Sprite sheet loading
-        // Sprites: Platformer Characters Pack by Kenney (www.kenney.nl)
+        // Sprites: New Platformer Pack by Kenney (www.kenney.nl)
         // License: CC0 (Public Domain) - See assets/sprites/LICENSE-kenney.txt
         this.spriteSheet = new Image();
-        this.spriteSheet.src = 'assets/sprites/player.png';
+        this.spriteSheet.src = 'assets/sprites/player-new-platformer.png';
         this.spriteSheetLoaded = false;
         this.spriteSheet.onload = () => {
             this.spriteSheetLoaded = true;
-            console.log('Player sprite sheet loaded successfully (Kenney Platformer)');
+            console.log('Player sprite sheet loaded successfully (Kenney New Platformer Pack)');
         };
         this.spriteSheet.onerror = () => {
             console.warn('Failed to load player sprite sheet, using fallback rendering');
@@ -78,33 +78,34 @@ class Player {
         };
 
         // Sprite configuration
-        // Kenney Platformer sprites: 80x110 pixels, no margins
-        // Tilesheet: 720x330 = 9 columns x 3 rows
-        this.spriteWidth = 80;
-        this.spriteHeight = 110;
-        this.spriteSpacing = 0;   // No margin in platformer pack
+        // Kenney New Platformer Pack: 128x128 pixels per sprite
+        // Sprite sheet: 1024x1024 with multiple character variants
+        this.spriteWidth = 128;
+        this.spriteHeight = 128;
+        this.spriteSpacing = 0;   // No margin in New Platformer Pack
 
-        // Sprite positions in tilesheet (estimated layout)
-        // Note: May need adjustment based on actual tilesheet layout
+        // Sprite positions from XML metadata (absolute pixel coordinates)
+        // Using character_beige variant from New Platformer Pack
+        // Coordinates from spritesheet-characters-default.xml
         this.spriteConfig = {
-            // Idle animation (1 frame) - usually first sprite
-            idle: [{ x: 0, y: 0 }],
+            // Idle animation (1 frame)
+            idle: [{ x: 512, y: 896 }],  // character_beige_idle
 
             // Walk animation (2 frames alternating)
             walk: [
-                { x: 1, y: 0 },  // walk1
-                { x: 2, y: 0 },  // walk2
-                { x: 1, y: 0 },  // walk1
-                { x: 0, y: 0 }   // idle (pause in cycle)
+                { x: 512, y: 640 },  // character_beige_walk_a
+                { x: 512, y: 512 },  // character_beige_walk_b
+                { x: 512, y: 640 },  // character_beige_walk_a (repeat)
+                { x: 512, y: 896 }   // character_beige_idle (pause in cycle)
             ],
 
             // Jump animation (1 frame)
-            jump: [{ x: 3, y: 0 }],
+            jump: [{ x: 512, y: 768 }],  // character_beige_jump
 
             // Climb animation (2 frames)
             climb: [
-                { x: 4, y: 0 },  // climb1
-                { x: 5, y: 0 }   // climb2
+                { x: 256, y: 768 },  // character_beige_climb_a
+                { x: 640, y: 384 }   // character_beige_climb_b
             ]
         };
     }
@@ -644,15 +645,15 @@ class Player {
         const sprite = spriteArray[frameIndex];
 
         // Calculate source position in sprite sheet
-        // Platformer sprites have no margin, so multiply by sprite dimensions
-        const srcX = sprite.x * this.spriteWidth;
-        const srcY = sprite.y * this.spriteHeight;
+        // New Platformer Pack uses absolute pixel coordinates from XML
+        const srcX = sprite.x;
+        const srcY = sprite.y;
 
         // Draw sprite scaled to player size
         ctx.drawImage(
             this.spriteSheet,
-            srcX, srcY, this.spriteWidth, this.spriteHeight,  // Source: 80x110 pixels
-            this.x, this.y, this.width, this.height           // Destination: scaled to player size (40x50)
+            srcX, srcY, this.spriteWidth, this.spriteHeight,  // Source: 128x128 pixels
+            this.x, this.y, this.width, this.height           // Destination: scaled to player size (32x48)
         );
     }
 

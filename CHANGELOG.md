@@ -5,6 +5,52 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.36.0] - 2025-11-02
+
+### Added
+- **Upgraded protagonist sprites to New Platformer Pack** (Player.js)
+  - Replaced 80×110 sprite with high-quality 128×128 New Platformer Pack character
+  - Character: Beige variant from Kenney's New Platformer Pack
+  - Updated sprite configuration with XML-based coordinates
+  - Enhanced visual quality and consistency
+  - Maintained all animation states (idle, walk, jump, climb, duck, hit)
+- **Upgraded antagonist sprites to Simplified Platformer Pack** (DonkeyKong.js)
+  - Replaced 80×110 zombie sprite with 96×96 Simplified Platformer Pack character
+  - Three distinct sprite files for animation variety:
+    - `antagonist-happy.png` - Menacing stance with personality
+    - `antagonist-walk.png` - Subtle movement for living idle animation
+    - `antagonist-throw.png` - Dynamic throwing action pose
+  - Improved sprite loading system with per-sprite state tracking
+  - Added image readiness validation (complete and naturalWidth checks)
+  - Better fallback rendering when sprites fail to load
+- **Updated sprite attribution** (assets/sprites/LICENSE-kenney.txt)
+  - Comprehensive documentation of both sprite packs used
+  - New Platformer Pack credited for protagonist
+  - Simplified Platformer Pack credited for antagonist
+  - All sprites CC0 licensed by Kenney (www.kenney.nl)
+
+### Changed
+- **Player sprite system refactor**
+  - Sprite dimensions: 80×110 → 128×128
+  - Sprite source: `player.png` → `player-new-platformer.png`
+  - Updated all animation frame coordinates based on XML metadata
+  - Improved sprite rendering with exact source coordinates
+- **DonkeyKong sprite system refactor**
+  - Changed from single sprite sheet to multiple individual PNG files
+  - Sprite dimensions: 80×110 → 96×96
+  - Implemented separate Image objects for each sprite type
+  - Enhanced loading state tracking with `spritesLoaded` object
+  - Updated animation configuration from grid coordinates to sprite name references
+  - Added `ctx.save()`/`ctx.restore()` for proper canvas state management
+
+### Technical Details
+- Both characters now use modern, high-quality Kenney sprite packs
+- Consistent art style across protagonist and antagonist
+- Improved visual presentation maintains retro arcade aesthetic
+- All sprites properly licensed under CC0 (public domain)
+- Sprite loading uses async Image() objects with onload/onerror handlers
+- Fallback rendering preserved for graceful degradation
+
 ## [0.35.0] - 2025-11-02
 
 ### Added

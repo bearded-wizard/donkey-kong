@@ -1,6 +1,16 @@
-	
 
-	Platformer Characters 1
+
+	Barrel Blaster - Sprite Attribution
+
+	This game uses sprites from the following Kenney asset packs:
+
+	1. New Platformer Pack (Protagonist sprites)
+	   - player-new-platformer.png (128x128 beige character)
+
+	2. Simplified Platformer Pack (Antagonist sprites)
+	   - antagonist-happy.png (96x96 menacing stance)
+	   - antagonist-walk.png (96x96 idle animation)
+	   - antagonist-throw.png (96x96 throwing action)
 
 	by  Kenney Vleugels (Kenney.nl)
 
