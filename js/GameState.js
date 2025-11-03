@@ -17,8 +17,9 @@ class GameState {
      * @param {HTMLCanvasElement} canvas - The game canvas
      * @param {Renderer} renderer - The renderer instance
      * @param {number} levelNumber - The level number to load (default: 1)
+     * @param {SettingsManager} settingsManager - Settings manager for mobile controls (optional, issue #151)
      */
-    constructor(canvas, renderer, levelNumber = 1) {
+    constructor(canvas, renderer, levelNumber = 1, settingsManager = null) {
         this.canvas = canvas;
         this.renderer = renderer;
 
@@ -28,8 +29,8 @@ class GameState {
         // Initialize input handler
         this.inputHandler = new InputHandler();
 
-        // Initialize mobile controls (issue #145)
-        this.mobileControls = new MobileControls(canvas, this.inputHandler, Constants);
+        // Initialize mobile controls (issue #145, #151)
+        this.mobileControls = new MobileControls(canvas, this.inputHandler, Constants, settingsManager);
 
         // Initialize audio manager (issues #40, #41)
         this.audioManager = new AudioManager();

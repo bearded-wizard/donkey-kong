@@ -5,6 +5,59 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.58.0] - 2025-11-03
+
+### Added
+- **In-game settings panel UI** (issue #151)
+  - DOM-based modal overlay accessible from pause menu (press S when paused)
+  - Settings button hint added to pause overlay ("PRESS S FOR SETTINGS")
+  - SettingsPanel class in `js/ui/SettingsPanel.js` for settings interface
+  - Real-time preview of setting changes before saving
+  - Three action buttons: Save (persist changes), Cancel (revert changes), Reset to Defaults
+  - Retro arcade aesthetic with red/cyan color scheme matching game theme
+  - Smooth fade-in/slide-in animations for modal appearance
+  - Keyboard navigation support (Escape to close, Enter to activate focused button)
+  - Touch-friendly interface with responsive design for mobile devices
+- **Form controls for game settings**
+  - Button Size slider: Small/Medium/Large options with real-time preview
+  - Button Opacity slider: 30%-100% range with 5% increments and live preview
+  - Haptic Feedback checkbox: Toggle vibration feedback on mobile devices
+  - Control Scheme toggle: D-pad/Joystick (disabled - marked as "Coming Soon")
+  - Visual feedback showing current values for all settings
+- **Settings integration with mobile controls**
+  - MobileControls now accepts optional SettingsManager parameter
+  - `loadSettings()` method reads size multiplier and opacity from SettingsManager
+  - `applySettings()` method rebuilds buttons and applies new settings in real-time
+  - Button sizes scaled by multiplier (0.8x, 1.0x, 1.2x) based on setting
+  - Button opacity applied dynamically to all control buttons
+  - GameState passes SettingsManager to MobileControls for integration
+- **Game state management for settings**
+  - New STATE_SETTINGS constant added to Constants.js
+  - Game class creates SettingsManager instance on initialization
+  - `openSettings()` method transitions from PAUSED to SETTINGS state
+  - `closeSettings()` method returns to PAUSED state when panel closes
+  - Settings panel created lazily on first open for performance
+  - SettingsManager passed to GameState for MobileControls integration
+- **Retro pixel-art styling** (styles.css)
+  - Settings overlay with semi-transparent dark background (85% opacity)
+  - Panel with glowing red border and deep black background
+  - Header with sticky positioning and red accent separator
+  - Custom styled range sliders with red-to-yellow gradient track
+  - Pixelated slider thumbs with red borders and glow effects
+  - Custom checkboxes with red border and yellow checkmark
+  - Toggle buttons with cyan active state matching game theme
+  - Color-coded action buttons: green (Save), red (Cancel), yellow (Reset)
+  - Hover effects with scale transforms and glowing shadows
+  - Scanline effects and retro font (monospace) throughout
+  - Mobile responsive adjustments for small screens
+
+### Changed
+- MobileControls constructor now accepts optional settingsManager parameter (backward compatible)
+- GameState constructor now accepts optional settingsManager parameter (backward compatible)
+- Button size calculations in MobileControls now use sizeMultiplier from settings
+- Pause overlay text repositioned to accommodate settings hint
+- index.html updated with new script tag for SettingsPanel.js in UI components section
+
 ## [0.57.0] - 2025-11-03
 
 ### Added

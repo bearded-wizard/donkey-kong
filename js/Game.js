@@ -31,18 +31,24 @@ class Game {
         // Input handler for menu navigation
         this.inputHandler = new InputHandler();
 
+        // Settings manager (issue #150)
+        this.settingsManager = new SettingsManager();
+
+        // Settings panel (issue #151) - created lazily
+        this.settingsPanel = null;
+
         // High score (placeholder for future implementation)
         this.highScore = 0;
     }
 
     /**
-     * Start a new game (issue #37)
+     * Start a new game (issue #37, #151)
      * Transitions from MENU to PLAYING state
      * @param {number} levelNumber - The level number to start (default: 1)
      */
     startGame(levelNumber = 1) {
-        // Initialize GameState with level
-        this.gameState = new GameState(this.canvas, this.renderer, levelNumber);
+        // Initialize GameState with level and settings manager (issue #151)
+        this.gameState = new GameState(this.canvas, this.renderer, levelNumber, this.settingsManager);
 
         // Transition to PLAYING state
         this.currentState = Constants.STATE_PLAYING;
@@ -76,6 +82,41 @@ class Game {
             this.pause();
         } else if (this.currentState === Constants.STATE_PAUSED) {
             this.resume();
+        }
+    }
+
+    /**
+     * Open settings panel (issue #151)
+     * Transitions to SETTINGS state from PAUSED state
+     */
+    openSettings() {
+        if (this.currentState === Constants.STATE_PAUSED) {
+            // Create settings panel lazily
+            if (!this.settingsPanel && this.gameState) {
+                this.settingsPanel = new SettingsPanel(
+                    this.settingsManager,
+                    this.gameState.mobileControls
+                );
+            }
+
+            // Show settings panel
+            if (this.settingsPanel) {
+                this.settingsPanel.show();
+                this.currentState = Constants.STATE_SETTINGS;
+            }
+        }
+    }
+
+    /**
+     * Close settings panel (issue #151)
+     * Returns to PAUSED state
+     */
+    closeSettings() {
+        if (this.currentState === Constants.STATE_SETTINGS) {
+            if (this.settingsPanel) {
+                this.settingsPanel.hide();
+            }
+            this.currentState = Constants.STATE_PAUSED;
         }
     }
 
@@ -185,6 +226,21 @@ class Game {
             this.togglePause();
         }
 
+        // Handle settings (S key when paused) (issue #151)
+        if (this.currentState === Constants.STATE_PAUSED &&
+            (this.inputHandler.isKeyPressed('s') || this.inputHandler.isKeyPressed('S'))) {
+            this.openSettings();
+        }
+
+        // Handle settings panel events (issue #151)
+        if (this.currentState === Constants.STATE_SETTINGS) {
+            // Settings panel handles its own keyboard events
+            // When panel closes, it will call closeSettings()
+            if (this.settingsPanel && !this.settingsPanel.isOpen()) {
+                this.closeSettings();
+            }
+        }
+
         // Clear pressed keys for next frame
         this.inputHandler.clearPressed();
     }
@@ -285,7 +341,7 @@ class Game {
     }
 
     /**
-     * Render pause overlay (issue #37)
+     * Render pause overlay (issue #37, #151)
      * @param {Renderer} renderer - The renderer instance
      */
     renderPauseOverlay(renderer) {
@@ -297,7 +353,7 @@ class Game {
         renderer.drawText(
             'PAUSED',
             Constants.CANVAS_WIDTH / 2,
-            Constants.CANVAS_HEIGHT / 2 - 40,
+            Constants.CANVAS_HEIGHT / 2 - 80,
             Constants.COLOR_TEXT,
             '48px monospace',
             'center'
@@ -307,8 +363,18 @@ class Game {
         renderer.drawText(
             'PRESS P TO RESUME',
             Constants.CANVAS_WIDTH / 2,
-            Constants.CANVAS_HEIGHT / 2 + 40,
+            Constants.CANVAS_HEIGHT / 2,
             Constants.COLOR_TEXT,
+            '20px monospace',
+            'center'
+        );
+
+        // Settings hint (issue #151)
+        renderer.drawText(
+            'PRESS S FOR SETTINGS',
+            Constants.CANVAS_WIDTH / 2,
+            Constants.CANVAS_HEIGHT / 2 + 40,
+            Constants.COLOR_UI_YELLOW,
             '20px monospace',
             'center'
         );

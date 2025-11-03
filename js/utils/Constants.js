@@ -209,6 +209,7 @@ const Constants = {
     STATE_MENU: 'menu',
     STATE_PLAYING: 'playing',
     STATE_PAUSED: 'paused',
+    STATE_SETTINGS: 'settings',
     STATE_LEVEL_COMPLETE: 'level_complete',
     STATE_GAME_OVER: 'game_over',
 

@@ -19,15 +19,26 @@ class MobileControls {
      * @param {HTMLCanvasElement} canvas - The game canvas for touch events
      * @param {InputHandler} inputHandler - Input handler to update button states
      * @param {Object} constants - Constants object (typically Constants.js)
+     * @param {SettingsManager} settingsManager - Settings manager for button customization (optional)
      */
-    constructor(canvas, inputHandler, constants) {
+    constructor(canvas, inputHandler, constants, settingsManager = null) {
         // Store references
         this.canvas = canvas;
         this.inputHandler = inputHandler;
         this.constants = constants;
+        this.settingsManager = settingsManager;
 
         // Track active touches by touch ID
         this.activeTouches = new Map();
+
+        // Current settings (size multiplier, opacity)
+        this.sizeMultiplier = 1.0;
+        this.opacity = 0.6;
+
+        // Load settings from SettingsManager if available (issue #151)
+        if (this.settingsManager) {
+            this.loadSettings();
+        }
 
         // Button definitions array (positions, sizes, types)
         this.buttons = this.initializeButtonDefinitions();
@@ -53,8 +64,9 @@ class MobileControls {
      * @returns {Array} Array of button definition objects
      */
     initializeButtonDefinitions() {
-        const buttonSize = this.constants.MOBILE_BUTTON_SIZE;
-        const jumpButtonSize = this.constants.MOBILE_JUMP_BUTTON_SIZE;
+        // Apply size multiplier from settings (issue #151)
+        const buttonSize = this.constants.MOBILE_BUTTON_SIZE * this.sizeMultiplier;
+        const jumpButtonSize = this.constants.MOBILE_JUMP_BUTTON_SIZE * this.sizeMultiplier;
         const dpadMargin = this.constants.MOBILE_DPAD_MARGIN;
         const jumpMargin = this.constants.MOBILE_JUMP_MARGIN;
 
@@ -567,6 +579,41 @@ class MobileControls {
             }
         }
         return false;
+    }
+
+    /**
+     * Load settings from SettingsManager (issue #151)
+     * Updates size multiplier and opacity from current settings
+     */
+    loadSettings() {
+        if (!this.settingsManager) return;
+
+        // Get size multiplier from buttonSize setting
+        this.sizeMultiplier = this.settingsManager.getButtonSizeMultiplier();
+
+        // Get opacity setting
+        this.opacity = this.settingsManager.get('buttonOpacity');
+    }
+
+    /**
+     * Apply settings and rebuild buttons (issue #151)
+     * Called when settings change in the settings panel for real-time preview
+     */
+    applySettings() {
+        // Load current settings
+        this.loadSettings();
+
+        // Rebuild button definitions with new size multiplier
+        this.buttons = this.initializeButtonDefinitions();
+
+        // Reinitialize button states with new buttons
+        this.initializeButtonStates();
+
+        // Apply new opacity to all button states
+        for (const [type, state] of this.buttonStates) {
+            state.targetOpacity = this.opacity;
+            state.currentOpacity = this.opacity;
+        }
     }
 
     /**

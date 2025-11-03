@@ -638,3 +638,438 @@ body {
         font-size: 16px;
     }
 }
+
+/* === Settings Panel (issue #151) === */
+/* Modal overlay - semi-transparent background */
+.settings-overlay {
+    display: none; /* Hidden by default, shown via JS */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.85);
+    z-index: 9999;
+    justify-content: center;
+    align-items: center;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+/* Settings panel container */
+.settings-panel {
+    background-color: #0a0a0a;
+    border: 4px solid #ff0000;
+    border-radius: 4px;
+    box-shadow:
+        0 0 20px rgba(255, 0, 0, 0.6),
+        inset 0 0 30px rgba(0, 0, 0, 0.9);
+    max-width: 600px;
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+    font-family: 'Courier New', monospace;
+    animation: slideIn 0.3s ease;
+    position: relative;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateY(-50px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* Panel header */
+.settings-header {
+    background-color: #1a0000;
+    padding: 20px;
+    border-bottom: 3px solid #ff0000;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.settings-title {
+    font-size: 32px;
+    color: #ff0000;
+    margin: 0;
+    text-shadow:
+        0 0 10px rgba(255, 0, 0, 0.8),
+        0 0 20px rgba(255, 0, 0, 0.5);
+    letter-spacing: 4px;
+}
+
+.settings-close {
+    background: none;
+    border: 2px solid #ff0000;
+    color: #ff0000;
+    font-size: 32px;
+    width: 40px;
+    height: 40px;
+    cursor: pointer;
+    border-radius: 2px;
+    transition: all 0.2s ease;
+    font-family: 'Courier New', monospace;
+    line-height: 1;
+    padding: 0;
+}
+
+.settings-close:hover {
+    background-color: #ff0000;
+    color: #000000;
+    box-shadow: 0 0 15px rgba(255, 0, 0, 0.8);
+    transform: scale(1.1);
+}
+
+/* Panel content */
+.settings-content {
+    padding: 30px;
+}
+
+/* Settings group */
+.settings-group {
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid #333333;
+}
+
+.settings-group:last-child {
+    border-bottom: none;
+}
+
+/* Settings label */
+.settings-label {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    color: #00ffff;
+    font-size: 16px;
+    font-weight: bold;
+    letter-spacing: 2px;
+    text-shadow: 0 0 5px rgba(0, 255, 255, 0.5);
+}
+
+.label-text {
+    color: #00ffff;
+}
+
+.label-value {
+    color: #ffff00;
+    font-size: 14px;
+    text-shadow: 0 0 5px rgba(255, 255, 0, 0.5);
+}
+
+.label-note {
+    color: #888888;
+    font-size: 12px;
+    font-style: italic;
+    text-shadow: none;
+}
+
+/* Slider container */
+.slider-container {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.slider-label {
+    color: #999999;
+    font-size: 12px;
+    letter-spacing: 1px;
+    min-width: 50px;
+    text-align: center;
+}
+
+/* Range slider */
+.settings-slider {
+    flex: 1;
+    -webkit-appearance: none;
+    appearance: none;
+    height: 8px;
+    background: linear-gradient(90deg, #ff0000 0%, #ffff00 100%);
+    outline: none;
+    border-radius: 4px;
+    box-shadow:
+        0 0 10px rgba(255, 0, 0, 0.3),
+        inset 0 0 5px rgba(0, 0, 0, 0.5);
+    cursor: pointer;
+}
+
+/* Slider thumb - WebKit */
+.settings-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 24px;
+    height: 24px;
+    background-color: #ffffff;
+    border: 3px solid #ff0000;
+    border-radius: 2px;
+    cursor: pointer;
+    box-shadow:
+        0 0 15px rgba(255, 0, 0, 0.8),
+        inset 0 0 5px rgba(0, 0, 0, 0.3);
+    transition: all 0.2s ease;
+}
+
+.settings-slider::-webkit-slider-thumb:hover {
+    background-color: #ffff00;
+    box-shadow:
+        0 0 20px rgba(255, 255, 0, 0.9),
+        inset 0 0 5px rgba(0, 0, 0, 0.3);
+    transform: scale(1.2);
+}
+
+/* Slider thumb - Firefox */
+.settings-slider::-moz-range-thumb {
+    width: 24px;
+    height: 24px;
+    background-color: #ffffff;
+    border: 3px solid #ff0000;
+    border-radius: 2px;
+    cursor: pointer;
+    box-shadow:
+        0 0 15px rgba(255, 0, 0, 0.8),
+        inset 0 0 5px rgba(0, 0, 0, 0.3);
+    transition: all 0.2s ease;
+}
+
+.settings-slider::-moz-range-thumb:hover {
+    background-color: #ffff00;
+    box-shadow:
+        0 0 20px rgba(255, 255, 0, 0.9),
+        inset 0 0 5px rgba(0, 0, 0, 0.3);
+    transform: scale(1.2);
+}
+
+/* Checkbox container */
+.checkbox-label {
+    cursor: pointer;
+}
+
+.checkbox-container {
+    position: relative;
+    display: inline-block;
+}
+
+/* Hide default checkbox */
+.settings-checkbox {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+}
+
+/* Custom checkbox */
+.checkbox-custom {
+    display: inline-block;
+    width: 32px;
+    height: 32px;
+    border: 3px solid #ff0000;
+    border-radius: 2px;
+    background-color: #1a1a1a;
+    position: relative;
+    box-shadow:
+        0 0 10px rgba(255, 0, 0, 0.3),
+        inset 0 0 5px rgba(0, 0, 0, 0.5);
+    transition: all 0.2s ease;
+}
+
+.checkbox-custom::after {
+    content: '';
+    position: absolute;
+    display: none;
+    left: 8px;
+    top: 3px;
+    width: 8px;
+    height: 14px;
+    border: solid #ffff00;
+    border-width: 0 3px 3px 0;
+    transform: rotate(45deg);
+    filter: drop-shadow(0 0 5px rgba(255, 255, 0, 0.8));
+}
+
+.settings-checkbox:checked ~ .checkbox-custom {
+    background-color: #ff0000;
+    box-shadow:
+        0 0 15px rgba(255, 0, 0, 0.8),
+        inset 0 0 10px rgba(0, 0, 0, 0.3);
+}
+
+.settings-checkbox:checked ~ .checkbox-custom::after {
+    display: block;
+}
+
+.checkbox-custom:hover {
+    box-shadow:
+        0 0 20px rgba(255, 0, 0, 0.6),
+        inset 0 0 5px rgba(0, 0, 0, 0.5);
+    transform: scale(1.1);
+}
+
+/* Toggle button container */
+.toggle-container {
+    display: flex;
+    gap: 10px;
+}
+
+.toggle-button {
+    flex: 1;
+    padding: 12px 20px;
+    background-color: #1a1a1a;
+    border: 3px solid #666666;
+    color: #666666;
+    font-family: 'Courier New', monospace;
+    font-size: 14px;
+    font-weight: bold;
+    letter-spacing: 2px;
+    cursor: pointer;
+    border-radius: 2px;
+    transition: all 0.2s ease;
+    box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.5);
+}
+
+.toggle-button:hover:not(:disabled) {
+    border-color: #999999;
+    color: #999999;
+    box-shadow:
+        0 0 10px rgba(153, 153, 153, 0.3),
+        inset 0 0 5px rgba(0, 0, 0, 0.5);
+}
+
+.toggle-button.active {
+    background-color: #00ffff;
+    border-color: #00ffff;
+    color: #000000;
+    box-shadow:
+        0 0 15px rgba(0, 255, 255, 0.8),
+        inset 0 0 10px rgba(0, 0, 0, 0.2);
+    text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+}
+
+.toggle-button:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+/* Panel footer */
+.settings-footer {
+    padding: 20px 30px;
+    background-color: #1a0000;
+    border-top: 3px solid #ff0000;
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+    position: sticky;
+    bottom: 0;
+}
+
+/* Settings buttons */
+.settings-button {
+    flex: 1;
+    min-width: 150px;
+    padding: 15px 25px;
+    font-family: 'Courier New', monospace;
+    font-size: 14px;
+    font-weight: bold;
+    letter-spacing: 2px;
+    border: 3px solid;
+    border-radius: 2px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+    box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.3);
+}
+
+.button-save {
+    background-color: #00ff00;
+    border-color: #00ff00;
+    color: #000000;
+}
+
+.button-save:hover {
+    background-color: #00cc00;
+    box-shadow:
+        0 0 20px rgba(0, 255, 0, 0.8),
+        inset 0 0 10px rgba(0, 0, 0, 0.3);
+    transform: scale(1.05);
+}
+
+.button-cancel {
+    background-color: #ff0000;
+    border-color: #ff0000;
+    color: #ffffff;
+}
+
+.button-cancel:hover {
+    background-color: #cc0000;
+    box-shadow:
+        0 0 20px rgba(255, 0, 0, 0.8),
+        inset 0 0 10px rgba(0, 0, 0, 0.3);
+    transform: scale(1.05);
+}
+
+.button-reset {
+    background-color: #ffff00;
+    border-color: #ffff00;
+    color: #000000;
+}
+
+.button-reset:hover {
+    background-color: #cccc00;
+    box-shadow:
+        0 0 20px rgba(255, 255, 0, 0.8),
+        inset 0 0 10px rgba(0, 0, 0, 0.3);
+    transform: scale(1.05);
+}
+
+/* Mobile responsive adjustments */
+@media screen and (max-width: 768px) {
+    .settings-panel {
+        max-width: 95%;
+        width: 95%;
+    }
+
+    .settings-title {
+        font-size: 24px;
+        letter-spacing: 2px;
+    }
+
+    .settings-content {
+        padding: 20px;
+    }
+
+    .settings-footer {
+        padding: 15px 20px;
+        flex-direction: column;
+    }
+
+    .settings-button {
+        min-width: 100%;
+    }
+
+    .settings-label {
+        font-size: 14px;
+    }
+
+    .slider-label {
+        font-size: 10px;
+        min-width: 40px;
+    }
+}
