@@ -538,6 +538,91 @@ const Constants = {
      * Same factor as button scaling to maintain visual balance
      */
     MOBILE_SMALL_SCREEN_MARGIN_SCALE: 2.5,
+
+    // ===========================
+    // VIRTUAL JOYSTICK CONSTANTS (issue #158)
+    // ===========================
+
+    /**
+     * Joystick base circle radius in pixels
+     * Outer boundary circle for joystick area
+     */
+    JOYSTICK_BASE_RADIUS: 80,
+
+    /**
+     * Joystick thumb circle radius in pixels
+     * Draggable inner circle (smaller than base)
+     */
+    JOYSTICK_THUMB_RADIUS: 35,
+
+    /**
+     * Maximum distance thumb can move from center in pixels
+     * Limits thumb movement to stay within visual boundary
+     */
+    JOYSTICK_MAX_DISTANCE: 45,
+
+    /**
+     * Dead zone radius for joystick center in pixels
+     * Thumb must move beyond this to register input
+     * Prevents drift from finger wobble at rest position
+     */
+    JOYSTICK_DEAD_ZONE: 15,
+
+    /**
+     * Joystick base circle color
+     */
+    JOYSTICK_COLOR_BASE: '#1a1a1a',
+
+    /**
+     * Joystick base border color (red to match D-pad)
+     */
+    JOYSTICK_COLOR_BASE_BORDER: '#ff0000',
+
+    /**
+     * Joystick thumb color
+     */
+    JOYSTICK_COLOR_THUMB: '#2a2a2a',
+
+    /**
+     * Joystick thumb border color when active
+     */
+    JOYSTICK_COLOR_THUMB_BORDER: '#ffff00',
+
+    /**
+     * Joystick thumb border color when in dead zone
+     */
+    JOYSTICK_COLOR_THUMB_BORDER_INACTIVE: '#ff0000',
+
+    /**
+     * Joystick opacity (matches D-pad opacity)
+     */
+    JOYSTICK_OPACITY: 0.6,
+
+    /**
+     * Joystick opacity when active
+     */
+    JOYSTICK_OPACITY_ACTIVE: 0.9,
+
+    /**
+     * Enable glow effect on joystick
+     */
+    JOYSTICK_GLOW_ENABLED: true,
+
+    /**
+     * Joystick glow blur radius
+     */
+    JOYSTICK_GLOW_BLUR: 10,
+
+    /**
+     * Joystick glow blur radius when active
+     */
+    JOYSTICK_GLOW_BLUR_ACTIVE: 20,
+
+    /**
+     * Angle threshold for 8-directional snapping in degrees
+     * 22.5 degrees = 45 degrees / 2 (provides clean 8-direction zones)
+     */
+    JOYSTICK_DIRECTION_THRESHOLD: 22.5,
 };
 
 // Freeze the object to prevent modifications

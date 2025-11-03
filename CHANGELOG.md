@@ -5,6 +5,98 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.65.0] - 2025-11-03
+
+### Added
+
+- **Virtual joystick control scheme** (issue #158)
+  - Alternative to D-pad for users who prefer analog-style controls
+  - Circular touch area with draggable thumb indicator
+  - 8-directional input calculation from analog thumb position
+  - Automatic snapping to nearest cardinal/diagonal direction
+  - Dead zone handling to prevent drift from finger wobble at rest
+  - Smooth analog-to-digital conversion for responsive gameplay
+  - Visual feedback: thumb border changes color when input is active
+  - Retro arcade styling matching existing D-pad aesthetic
+  - Glow effects and scanline overlay for authentic arcade feel
+- **Joystick rendering system**
+  - Circular base and thumb drawn on canvas with proper layering
+  - Animated opacity and glow transitions when active/inactive
+  - Dead zone indicator (subtle circle at center)
+  - Responsive scaling for small screens (matches D-pad behavior)
+  - Scanline overlay rendered within circular bounds
+- **Control scheme toggle in SettingsManager**
+  - `controlScheme` setting: 'dpad' (default) or 'joystick'
+  - Switchable in settings panel (future feature)
+  - Preference saved to localStorage for persistence
+  - Real-time switching between control schemes
+- **Joystick constants** in Constants.js
+  - `JOYSTICK_BASE_RADIUS`: 80px base circle radius
+  - `JOYSTICK_THUMB_RADIUS`: 35px thumb circle radius
+  - `JOYSTICK_MAX_DISTANCE`: 45px maximum thumb movement
+  - `JOYSTICK_DEAD_ZONE`: 15px dead zone radius to prevent drift
+  - `JOYSTICK_COLOR_BASE`: dark background (#1a1a1a)
+  - `JOYSTICK_COLOR_BASE_BORDER`: red border (#ff0000)
+  - `JOYSTICK_COLOR_THUMB`: lighter background (#2a2a2a)
+  - `JOYSTICK_COLOR_THUMB_BORDER`: yellow when active (#ffff00), red when inactive
+  - `JOYSTICK_OPACITY`: 0.6 default, 0.9 when active
+  - `JOYSTICK_GLOW_BLUR`: 10px default, 20px when active
+  - `JOYSTICK_DIRECTION_THRESHOLD`: 22.5 degrees for 8-way snapping
+
+### Changed
+
+- **MobileControls touch event handling** (issue #158)
+  - `handleTouchStart()`: detects joystick area touches, initializes joystick state
+  - `handleTouchMove()`: updates thumb position and calculates directional input
+  - `handleTouchEnd()`: resets joystick to center, releases all inputs
+  - `isJoystickMode()`: checks if joystick control scheme is active
+  - `isTouchInJoystickArea()`: hit detection for circular joystick area
+  - `calculateJoystickDirection()`: converts analog position to 8-way digital input
+  - `updateJoystickThumb()`: applies thumb constraints and updates InputHandler
+  - `resetJoystick()`: returns thumb to center and clears all directional inputs
+- **MobileControls rendering** (issue #158)
+  - `render()`: conditionally renders joystick or D-pad based on control scheme
+  - `renderJoystick()`: draws joystick base and thumb with retro styling
+  - `renderJoystickScanlines()`: renders scanlines within circular bounds
+  - Jump button always rendered regardless of control scheme
+- **MobileControls lifecycle methods** (issue #158)
+  - `update()`: animates joystick opacity and glow transitions
+  - `applySettings()`: rebuilds joystick position when settings change
+  - `handleResize()`: rebuilds joystick position on screen size changes
+  - `initializeJoystickPosition()`: calculates joystick center in bottom-left corner
+- **SettingsManager validation**
+  - Already supports `controlScheme` validation ('dpad' | 'joystick')
+  - Persists control scheme preference across browser sessions
+
+### Technical Details
+
+- **8-directional input calculation**
+  - Uses `Math.atan2()` to calculate angle from thumb position
+  - Divides 360 degrees into eight 45-degree zones
+  - Right: 337.5-22.5, Down-Right: 22.5-67.5, Down: 67.5-112.5, etc.
+  - Snaps to nearest direction for consistent digital input
+  - Dead zone prevents input when thumb near center (< 15px from origin)
+- **Thumb position constraints**
+  - Limits thumb movement to `JOYSTICK_MAX_DISTANCE` from center
+  - Uses vector normalization: `ratio = maxDistance / distance`
+  - Prevents thumb from moving outside visual boundary
+- **Animation system**
+  - Smooth lerp interpolation for opacity and glow blur
+  - Same easing function as D-pad buttons (`easeOut` cubic)
+  - Transition duration: 150ms (matches existing button animations)
+- **Responsive scaling**
+  - Applies same scaling logic as D-pad buttons
+  - Small screens (< 400px): 2.5x multiplier for comfortable touch targets
+  - User size preference (small/medium/large) also applied
+- **Rendering optimization**
+  - Dirty flag tracking for joystick state changes
+  - Only redraws when thumb moves or active state changes
+  - Scanlines calculated using circle equation for accurate clipping
+- **Input integration**
+  - Uses existing InputHandler touch button methods
+  - Compatible with keyboard input (no conflicts)
+  - Releases all directional inputs when thumb in dead zone
+
 ## [0.64.0] - 2025-11-03
 
 ### Changed

@@ -76,6 +76,23 @@ class MobileControls {
         this.performanceLogging = this.constants.MOBILE_PERFORMANCE_LOGGING;
         this.dirtyFlagEnabled = this.constants.MOBILE_DIRTY_FLAG_OPTIMIZATION;
         this.anyButtonNeedsRedraw = false;
+
+        // Virtual joystick state (issue #158)
+        this.joystickState = {
+            active: false,
+            touchId: null,
+            centerX: 0,
+            centerY: 0,
+            thumbX: 0,
+            thumbY: 0,
+            currentDirection: null, // Current 8-way direction
+            opacity: this.constants.JOYSTICK_OPACITY,
+            glowBlur: this.constants.JOYSTICK_GLOW_BLUR,
+            needsRedraw: false
+        };
+
+        // Initialize joystick position
+        this.initializeJoystickPosition();
     }
 
     /**
@@ -86,6 +103,25 @@ class MobileControls {
         if (InputHandler.isMobileDevice()) {
             this.tutorialOverlay = new MobileTutorialOverlay(this.constants, this);
         }
+    }
+
+    /**
+     * Initialize joystick position (issue #158)
+     * Places joystick in bottom-left corner, matching D-pad position
+     */
+    initializeJoystickPosition() {
+        const responsiveScale = this.getResponsiveScaleFactor();
+        const responsiveMarginScale = this.getResponsiveMarginScale();
+        const baseRadius = this.constants.JOYSTICK_BASE_RADIUS * this.sizeMultiplier * responsiveScale;
+        const margin = this.constants.MOBILE_DPAD_MARGIN * responsiveMarginScale;
+
+        // Center joystick in same area as D-pad
+        this.joystickState.centerX = margin + baseRadius;
+        this.joystickState.centerY = this.constants.CANVAS_HEIGHT - margin - baseRadius;
+
+        // Initialize thumb at center
+        this.joystickState.thumbX = this.joystickState.centerX;
+        this.joystickState.thumbY = this.joystickState.centerY;
     }
 
     /**
@@ -244,6 +280,7 @@ class MobileControls {
 
     /**
      * Handle window resize event (issue #156)
+     * (issue #158: rebuild joystick position on resize)
      * Rebuilds button definitions if screen size crosses the small screen threshold
      */
     handleResize() {
@@ -265,11 +302,15 @@ class MobileControls {
 
             // Reinitialize button states
             this.initializeButtonStates();
+
+            // Rebuild joystick position with new scaling (issue #158)
+            this.initializeJoystickPosition();
         }
     }
 
     /**
      * Handle touch start event (issue #157: optimized with performance logging)
+     * (issue #158: added joystick support)
      * @param {TouchEvent} event - The touch event
      */
     handleTouchStart(event) {
@@ -296,7 +337,19 @@ class MobileControls {
             const canvasX = (touch.clientX - rect.left) * scaleX;
             const canvasY = (touch.clientY - rect.top) * scaleY;
 
-            // Check which button was touched (optimized hit detection)
+            // Check for joystick mode (issue #158)
+            if (this.isJoystickMode()) {
+                // Check if touch is in joystick area
+                if (this.isTouchInJoystickArea(canvasX, canvasY)) {
+                    this.joystickState.active = true;
+                    this.joystickState.touchId = touch.identifier;
+                    this.updateJoystickThumb(canvasX, canvasY);
+                    this.triggerHaptic();
+                    continue; // Skip button processing
+                }
+            }
+
+            // D-pad/button mode or jump button (always available)
             const button = this.getTouchedButton(canvasX, canvasY);
 
             if (button) {
@@ -331,6 +384,7 @@ class MobileControls {
 
     /**
      * Handle touch move event (issue #157: optimized with throttling)
+     * (issue #158: added joystick support)
      * Throttles high-frequency touch updates to 60 FPS (16ms intervals)
      * @param {TouchEvent} event - The touch event
      */
@@ -358,6 +412,14 @@ class MobileControls {
             // Convert screen coordinates to canvas coordinates
             const canvasX = (touch.clientX - rect.left) * scaleX;
             const canvasY = (touch.clientY - rect.top) * scaleY;
+
+            // Check if this is the joystick touch (issue #158)
+            if (this.isJoystickMode() &&
+                this.joystickState.active &&
+                touch.identifier === this.joystickState.touchId) {
+                this.updateJoystickThumb(canvasX, canvasY);
+                continue; // Skip button processing
+            }
 
             // Get the button currently associated with this touch
             const currentButton = this.activeTouches.get(touch.identifier);
@@ -409,6 +471,7 @@ class MobileControls {
 
     /**
      * Handle touch end event (issue #157: optimized with performance logging)
+     * (issue #158: added joystick support)
      * @param {TouchEvent} event - The touch event
      */
     handleTouchEnd(event) {
@@ -425,6 +488,15 @@ class MobileControls {
         // Process each ended touch
         for (let i = 0; i < event.changedTouches.length; i++) {
             const touch = event.changedTouches[i];
+
+            // Check if this is the joystick touch (issue #158)
+            if (this.isJoystickMode() &&
+                this.joystickState.active &&
+                touch.identifier === this.joystickState.touchId) {
+                this.resetJoystick();
+                continue; // Skip button processing
+            }
+
             const button = this.activeTouches.get(touch.identifier);
 
             if (button) {
@@ -460,6 +532,173 @@ class MobileControls {
     handleTouchCancel(event) {
         // Treat cancel same as end
         this.handleTouchEnd(event);
+    }
+
+    /**
+     * Check if control scheme is set to joystick (issue #158)
+     * @returns {boolean} True if joystick control scheme is active
+     */
+    isJoystickMode() {
+        if (!this.settingsManager) return false;
+        return this.settingsManager.get('controlScheme') === 'joystick';
+    }
+
+    /**
+     * Check if touch is within joystick base area (issue #158)
+     * @param {number} x - Canvas X coordinate
+     * @param {number} y - Canvas Y coordinate
+     * @returns {boolean} True if touch is within joystick area
+     */
+    isTouchInJoystickArea(x, y) {
+        const responsiveScale = this.getResponsiveScaleFactor();
+        const baseRadius = this.constants.JOYSTICK_BASE_RADIUS * this.sizeMultiplier * responsiveScale;
+
+        const dx = x - this.joystickState.centerX;
+        const dy = y - this.joystickState.centerY;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+
+        return distance <= baseRadius;
+    }
+
+    /**
+     * Calculate 8-directional input from joystick position (issue #158)
+     * Converts analog thumb position to digital 8-way directional input
+     * @param {number} dx - Delta X from center
+     * @param {number} dy - Delta Y from center
+     * @returns {Object|null} Direction object with up/down/left/right booleans, or null if in dead zone
+     */
+    calculateJoystickDirection(dx, dy) {
+        const distance = Math.sqrt(dx * dx + dy * dy);
+
+        // Check dead zone
+        if (distance < this.constants.JOYSTICK_DEAD_ZONE) {
+            return null; // No input in dead zone
+        }
+
+        // Calculate angle in degrees (0 = right, 90 = down, 180 = left, 270 = up)
+        let angle = Math.atan2(dy, dx) * (180 / Math.PI);
+        // Normalize to 0-360
+        if (angle < 0) angle += 360;
+
+        // 8-directional zones (45 degrees each)
+        // Right: 337.5-22.5 (0°)
+        // Down-Right: 22.5-67.5 (45°)
+        // Down: 67.5-112.5 (90°)
+        // Down-Left: 112.5-157.5 (135°)
+        // Left: 157.5-202.5 (180°)
+        // Up-Left: 202.5-247.5 (225°)
+        // Up: 247.5-292.5 (270°)
+        // Up-Right: 292.5-337.5 (315°)
+
+        const direction = {
+            up: false,
+            down: false,
+            left: false,
+            right: false
+        };
+
+        // Right (337.5-22.5)
+        if (angle >= 337.5 || angle < 22.5) {
+            direction.right = true;
+        }
+        // Down-Right (22.5-67.5)
+        else if (angle >= 22.5 && angle < 67.5) {
+            direction.right = true;
+            direction.down = true;
+        }
+        // Down (67.5-112.5)
+        else if (angle >= 67.5 && angle < 112.5) {
+            direction.down = true;
+        }
+        // Down-Left (112.5-157.5)
+        else if (angle >= 112.5 && angle < 157.5) {
+            direction.down = true;
+            direction.left = true;
+        }
+        // Left (157.5-202.5)
+        else if (angle >= 157.5 && angle < 202.5) {
+            direction.left = true;
+        }
+        // Up-Left (202.5-247.5)
+        else if (angle >= 202.5 && angle < 247.5) {
+            direction.left = true;
+            direction.up = true;
+        }
+        // Up (247.5-292.5)
+        else if (angle >= 247.5 && angle < 292.5) {
+            direction.up = true;
+        }
+        // Up-Right (292.5-337.5)
+        else if (angle >= 292.5 && angle < 337.5) {
+            direction.up = true;
+            direction.right = true;
+        }
+
+        return direction;
+    }
+
+    /**
+     * Update joystick thumb position and apply inputs (issue #158)
+     * @param {number} canvasX - Canvas X coordinate of touch
+     * @param {number} canvasY - Canvas Y coordinate of touch
+     */
+    updateJoystickThumb(canvasX, canvasY) {
+        // Calculate delta from center
+        let dx = canvasX - this.joystickState.centerX;
+        let dy = canvasY - this.joystickState.centerY;
+
+        // Limit thumb to maximum distance
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        const responsiveScale = this.getResponsiveScaleFactor();
+        const maxDistance = this.constants.JOYSTICK_MAX_DISTANCE * this.sizeMultiplier * responsiveScale;
+
+        if (distance > maxDistance) {
+            const ratio = maxDistance / distance;
+            dx *= ratio;
+            dy *= ratio;
+        }
+
+        // Update thumb position
+        this.joystickState.thumbX = this.joystickState.centerX + dx;
+        this.joystickState.thumbY = this.joystickState.centerY + dy;
+
+        // Calculate and apply direction
+        const direction = this.calculateJoystickDirection(dx, dy);
+
+        // Release all directional inputs first
+        this.inputHandler.setTouchButton('left', false);
+        this.inputHandler.setTouchButton('right', false);
+        this.inputHandler.setTouchButton('up', false);
+        this.inputHandler.setTouchButton('down', false);
+
+        // Apply new direction if outside dead zone
+        if (direction) {
+            if (direction.left) this.inputHandler.setTouchButton('left', true);
+            if (direction.right) this.inputHandler.setTouchButton('right', true);
+            if (direction.up) this.inputHandler.setTouchButton('up', true);
+            if (direction.down) this.inputHandler.setTouchButton('down', true);
+        }
+
+        this.joystickState.currentDirection = direction;
+        this.joystickState.needsRedraw = true;
+    }
+
+    /**
+     * Reset joystick to center position (issue #158)
+     */
+    resetJoystick() {
+        this.joystickState.active = false;
+        this.joystickState.touchId = null;
+        this.joystickState.thumbX = this.joystickState.centerX;
+        this.joystickState.thumbY = this.joystickState.centerY;
+        this.joystickState.currentDirection = null;
+        this.joystickState.needsRedraw = true;
+
+        // Release all directional inputs
+        this.inputHandler.setTouchButton('left', false);
+        this.inputHandler.setTouchButton('right', false);
+        this.inputHandler.setTouchButton('up', false);
+        this.inputHandler.setTouchButton('down', false);
     }
 
     /**
@@ -501,6 +740,7 @@ class MobileControls {
 
     /**
      * Update method (lifecycle) (issue #157: optimized with dirty flag tracking)
+     * (issue #158: added joystick animation support)
      * Handles smooth transitions for button animations
      * Uses dirty flag optimization to minimize rendering overhead
      * @param {number} deltaTime - Time elapsed since last frame in seconds
@@ -513,6 +753,41 @@ class MobileControls {
 
         // Reset global dirty flag (will be set if any button needs redraw)
         this.anyButtonNeedsRedraw = false;
+
+        // Update joystick animation state (issue #158)
+        if (this.isJoystickMode()) {
+            const targetOpacity = this.joystickState.active ?
+                this.constants.JOYSTICK_OPACITY_ACTIVE :
+                this.constants.JOYSTICK_OPACITY;
+
+            const targetGlowBlur = this.joystickState.active ?
+                this.constants.JOYSTICK_GLOW_BLUR_ACTIVE :
+                this.constants.JOYSTICK_GLOW_BLUR;
+
+            const transitionSpeed = deltaTime / (this.constants.MOBILE_TRANSITION_DURATION / 1000);
+            const easedProgress = this.easeOut(Math.min(transitionSpeed, 1));
+
+            const prevOpacity = this.joystickState.opacity;
+            const prevGlowBlur = this.joystickState.glowBlur;
+
+            this.joystickState.opacity = this.lerp(this.joystickState.opacity, targetOpacity, easedProgress);
+            this.joystickState.glowBlur = this.lerp(this.joystickState.glowBlur, targetGlowBlur, easedProgress);
+
+            const hasChanged =
+                Math.abs(prevOpacity - this.joystickState.opacity) > 0.001 ||
+                Math.abs(prevGlowBlur - this.joystickState.glowBlur) > 0.1;
+
+            if (hasChanged) {
+                this.joystickState.needsRedraw = true;
+            } else {
+                if (Math.abs(this.joystickState.opacity - targetOpacity) < 0.001) {
+                    this.joystickState.opacity = targetOpacity;
+                }
+                if (Math.abs(this.joystickState.glowBlur - targetGlowBlur) < 0.1) {
+                    this.joystickState.glowBlur = targetGlowBlur;
+                }
+            }
+        }
 
         // Update animation states for all buttons
         for (const button of this.buttons) {
@@ -593,6 +868,7 @@ class MobileControls {
 
     /**
      * Render mobile control buttons (lifecycle) (issue #157: optimized with dirty flag)
+     * (issue #158: added joystick rendering support)
      * Only renders buttons that have changed state (dirty flag optimization)
      * This significantly reduces canvas operations during steady state
      * @param {CanvasRenderingContext2D} ctx - Canvas rendering context
@@ -603,23 +879,38 @@ class MobileControls {
             return;
         }
 
-        // Dirty flag optimization: only render if any button needs redraw (issue #157)
-        // Note: For initial implementation, always render to ensure tutorial overlay works
-        // In production, consider separating tutorial rendering from button rendering
-        if (this.dirtyFlagEnabled && !this.anyButtonNeedsRedraw) {
-            // Still need to render tutorial overlay even if buttons unchanged
-            if (this.tutorialOverlay) {
-                this.tutorialOverlay.render(ctx);
-            }
-            return;
-        }
+        // Check if joystick mode is active (issue #158)
+        if (this.isJoystickMode()) {
+            // Render joystick instead of D-pad
+            this.renderJoystick(ctx);
 
-        // Render each button with retro pixel-art styling
-        for (const button of this.buttons) {
-            const state = this.buttonStates.get(button.type);
-            // Only render if button needs redraw (per-button dirty flag)
-            if (!this.dirtyFlagEnabled || (state && state.needsRedraw)) {
-                this.renderButton(ctx, button);
+            // Still render jump button
+            const jumpButton = this.buttons.find(b => b.type === 'jump');
+            if (jumpButton) {
+                const state = this.buttonStates.get('jump');
+                if (!this.dirtyFlagEnabled || (state && state.needsRedraw)) {
+                    this.renderButton(ctx, jumpButton);
+                }
+            }
+        } else {
+            // Dirty flag optimization: only render if any button needs redraw (issue #157)
+            // Note: For initial implementation, always render to ensure tutorial overlay works
+            // In production, consider separating tutorial rendering from button rendering
+            if (this.dirtyFlagEnabled && !this.anyButtonNeedsRedraw) {
+                // Still need to render tutorial overlay even if buttons unchanged
+                if (this.tutorialOverlay) {
+                    this.tutorialOverlay.render(ctx);
+                }
+                return;
+            }
+
+            // Render each button with retro pixel-art styling
+            for (const button of this.buttons) {
+                const state = this.buttonStates.get(button.type);
+                // Only render if button needs redraw (per-button dirty flag)
+                if (!this.dirtyFlagEnabled || (state && state.needsRedraw)) {
+                    this.renderButton(ctx, button);
+                }
             }
         }
 
@@ -790,6 +1081,156 @@ class MobileControls {
     }
 
     /**
+     * Render virtual joystick (issue #158)
+     * Draws circular base and draggable thumb with retro styling
+     * @param {CanvasRenderingContext2D} ctx - Canvas rendering context
+     */
+    renderJoystick(ctx) {
+        const responsiveScale = this.getResponsiveScaleFactor();
+        const baseRadius = this.constants.JOYSTICK_BASE_RADIUS * this.sizeMultiplier * responsiveScale;
+        const thumbRadius = this.constants.JOYSTICK_THUMB_RADIUS * this.sizeMultiplier * responsiveScale;
+        const opacity = this.joystickState.opacity;
+        const glowBlur = this.joystickState.glowBlur;
+
+        ctx.save();
+        ctx.globalAlpha = opacity;
+
+        // Draw glow effect if enabled
+        if (this.constants.JOYSTICK_GLOW_ENABLED) {
+            ctx.shadowColor = this.constants.JOYSTICK_COLOR_BASE_BORDER;
+            ctx.shadowBlur = glowBlur;
+            ctx.shadowOffsetX = 0;
+            ctx.shadowOffsetY = 0;
+        }
+
+        // Draw base circle
+        ctx.beginPath();
+        ctx.arc(
+            this.joystickState.centerX,
+            this.joystickState.centerY,
+            baseRadius,
+            0,
+            Math.PI * 2
+        );
+        ctx.fillStyle = this.constants.JOYSTICK_COLOR_BASE;
+        ctx.fill();
+
+        // Reset shadow for subsequent drawing
+        ctx.shadowBlur = 0;
+
+        // Draw base border
+        ctx.strokeStyle = this.constants.JOYSTICK_COLOR_BASE_BORDER;
+        ctx.lineWidth = 3;
+        ctx.stroke();
+
+        // Draw inner border for depth effect
+        ctx.beginPath();
+        ctx.arc(
+            this.joystickState.centerX,
+            this.joystickState.centerY,
+            baseRadius - 4,
+            0,
+            Math.PI * 2
+        );
+        ctx.strokeStyle = this.constants.JOYSTICK_COLOR_BASE_BORDER;
+        ctx.lineWidth = 1;
+        ctx.globalAlpha = opacity * 0.5;
+        ctx.stroke();
+
+        // Reset alpha for thumb
+        ctx.globalAlpha = opacity;
+
+        // Draw thumb circle
+        ctx.beginPath();
+        ctx.arc(
+            this.joystickState.thumbX,
+            this.joystickState.thumbY,
+            thumbRadius,
+            0,
+            Math.PI * 2
+        );
+        ctx.fillStyle = this.constants.JOYSTICK_COLOR_THUMB;
+        ctx.fill();
+
+        // Draw thumb border (color changes based on active state)
+        const thumbBorderColor = this.joystickState.currentDirection ?
+            this.constants.JOYSTICK_COLOR_THUMB_BORDER :
+            this.constants.JOYSTICK_COLOR_THUMB_BORDER_INACTIVE;
+        ctx.strokeStyle = thumbBorderColor;
+        ctx.lineWidth = 3;
+        ctx.stroke();
+
+        // Draw inner thumb border
+        ctx.beginPath();
+        ctx.arc(
+            this.joystickState.thumbX,
+            this.joystickState.thumbY,
+            thumbRadius - 4,
+            0,
+            Math.PI * 2
+        );
+        ctx.strokeStyle = thumbBorderColor;
+        ctx.lineWidth = 1;
+        ctx.globalAlpha = opacity * 0.5;
+        ctx.stroke();
+
+        // Draw dead zone indicator (subtle circle at center)
+        ctx.globalAlpha = opacity * 0.3;
+        ctx.beginPath();
+        ctx.arc(
+            this.joystickState.centerX,
+            this.joystickState.centerY,
+            this.constants.JOYSTICK_DEAD_ZONE,
+            0,
+            Math.PI * 2
+        );
+        ctx.strokeStyle = '#555555';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+
+        // Draw scanlines if enabled
+        if (this.constants.MOBILE_SCANLINE_ENABLED) {
+            this.renderJoystickScanlines(ctx, baseRadius);
+        }
+
+        ctx.restore();
+
+        // Clear needsRedraw flag
+        this.joystickState.needsRedraw = false;
+    }
+
+    /**
+     * Render scanline overlay on joystick (issue #158)
+     * @param {CanvasRenderingContext2D} ctx - Canvas rendering context
+     * @param {number} baseRadius - Radius of joystick base
+     */
+    renderJoystickScanlines(ctx, baseRadius) {
+        const spacing = this.constants.MOBILE_SCANLINE_SPACING;
+        const opacity = this.constants.MOBILE_SCANLINE_OPACITY;
+
+        ctx.globalAlpha = opacity;
+        ctx.strokeStyle = '#000000';
+        ctx.lineWidth = 1;
+
+        const centerX = this.joystickState.centerX;
+        const centerY = this.joystickState.centerY;
+
+        // Draw horizontal scanlines within circular bounds
+        for (let y = centerY - baseRadius; y < centerY + baseRadius; y += spacing) {
+            // Calculate line width based on circle equation
+            const dy = y - centerY;
+            const dx = Math.sqrt(baseRadius * baseRadius - dy * dy);
+
+            if (!isNaN(dx)) {
+                ctx.beginPath();
+                ctx.moveTo(centerX - dx, y);
+                ctx.lineTo(centerX + dx, y);
+                ctx.stroke();
+            }
+        }
+    }
+
+    /**
      * Load settings from SettingsManager (issue #151)
      * Updates size multiplier and opacity from current settings
      */
@@ -805,6 +1246,7 @@ class MobileControls {
 
     /**
      * Apply settings and rebuild buttons (issue #151)
+     * (issue #158: rebuild joystick position when settings change)
      * Called when settings change in the settings panel for real-time preview
      */
     applySettings() {
@@ -822,6 +1264,9 @@ class MobileControls {
             state.targetOpacity = this.opacity;
             state.currentOpacity = this.opacity;
         }
+
+        // Rebuild joystick position with new size multiplier (issue #158)
+        this.initializeJoystickPosition();
     }
 
     /**
