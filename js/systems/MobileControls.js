@@ -69,7 +69,8 @@ class MobileControls {
                 y: dpadCenterY,
                 width: buttonSize,
                 height: buttonSize,
-                color: this.constants.MOBILE_COLOR_DPAD,
+                bgColor: this.constants.MOBILE_COLOR_DPAD_BG,
+                borderColor: this.constants.MOBILE_COLOR_DPAD_BORDER,
                 label: '\u25C0' // Left arrow ◀
             },
             {
@@ -78,7 +79,8 @@ class MobileControls {
                 y: dpadCenterY,
                 width: buttonSize,
                 height: buttonSize,
-                color: this.constants.MOBILE_COLOR_DPAD,
+                bgColor: this.constants.MOBILE_COLOR_DPAD_BG,
+                borderColor: this.constants.MOBILE_COLOR_DPAD_BORDER,
                 label: '\u25B6' // Right arrow ▶
             },
             {
@@ -87,7 +89,8 @@ class MobileControls {
                 y: dpadCenterY - buttonSize,
                 width: buttonSize,
                 height: buttonSize,
-                color: this.constants.MOBILE_COLOR_DPAD,
+                bgColor: this.constants.MOBILE_COLOR_DPAD_BG,
+                borderColor: this.constants.MOBILE_COLOR_DPAD_BORDER,
                 label: '\u25B2' // Up arrow ▲
             },
             {
@@ -96,7 +99,8 @@ class MobileControls {
                 y: dpadCenterY + buttonSize,
                 width: buttonSize,
                 height: buttonSize,
-                color: this.constants.MOBILE_COLOR_DPAD,
+                bgColor: this.constants.MOBILE_COLOR_DPAD_BG,
+                borderColor: this.constants.MOBILE_COLOR_DPAD_BORDER,
                 label: '\u25BC' // Down arrow ▼
             },
             // Jump button
@@ -106,7 +110,8 @@ class MobileControls {
                 y: jumpY,
                 width: buttonSize,
                 height: buttonSize,
-                color: this.constants.MOBILE_COLOR_JUMP,
+                bgColor: this.constants.MOBILE_COLOR_JUMP_BG,
+                borderColor: this.constants.MOBILE_COLOR_JUMP_BORDER,
                 label: 'A'
             }
         ];
@@ -283,44 +288,123 @@ class MobileControls {
             return;
         }
 
-        // Render each button
+        // Render each button with retro pixel-art styling
         for (const button of this.buttons) {
-            // Check if button is currently pressed
-            const isPressed = this.isButtonPressed(button.type);
+            this.renderButton(ctx, button);
+        }
+    }
 
-            // Calculate opacity based on press state
-            const opacity = isPressed ?
-                this.constants.MOBILE_BUTTON_OPACITY_PRESSED :
-                this.constants.MOBILE_BUTTON_OPACITY;
+    /**
+     * Render a single button with retro styling
+     * @param {CanvasRenderingContext2D} ctx - Canvas rendering context
+     * @param {Object} button - Button definition object
+     */
+    renderButton(ctx, button) {
+        // Check if button is currently pressed
+        const isPressed = this.isButtonPressed(button.type);
 
-            // Save context state
-            ctx.save();
+        // Calculate opacity based on press state
+        const opacity = isPressed ?
+            this.constants.MOBILE_BUTTON_OPACITY_PRESSED :
+            this.constants.MOBILE_BUTTON_OPACITY;
 
-            // Set opacity
-            ctx.globalAlpha = opacity;
+        // Save context state
+        ctx.save();
 
-            // Draw button background
-            ctx.fillStyle = button.color;
-            ctx.fillRect(button.x, button.y, button.width, button.height);
+        // Set opacity
+        ctx.globalAlpha = opacity;
 
-            // Draw button border
-            ctx.strokeStyle = this.constants.MOBILE_COLOR_BORDER;
-            ctx.lineWidth = 2;
-            ctx.strokeRect(button.x, button.y, button.width, button.height);
+        // Draw glow effect if enabled
+        if (this.constants.MOBILE_GLOW_ENABLED) {
+            this.renderGlowEffect(ctx, button);
+        }
 
-            // Draw button label
-            ctx.fillStyle = this.constants.MOBILE_COLOR_BORDER;
-            ctx.font = '32px monospace';
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.fillText(
-                button.label,
-                button.x + button.width / 2,
-                button.y + button.height / 2
-            );
+        // Draw button background (dark fill)
+        ctx.fillStyle = button.bgColor;
+        ctx.fillRect(button.x, button.y, button.width, button.height);
 
-            // Restore context state
-            ctx.restore();
+        // Draw button border (bright red/yellow)
+        ctx.strokeStyle = button.borderColor;
+        ctx.lineWidth = 3;
+        ctx.strokeRect(button.x, button.y, button.width, button.height);
+
+        // Draw inner border for depth effect
+        ctx.strokeStyle = button.borderColor;
+        ctx.lineWidth = 1;
+        ctx.globalAlpha = opacity * 0.5;
+        ctx.strokeRect(
+            button.x + 4,
+            button.y + 4,
+            button.width - 8,
+            button.height - 8
+        );
+
+        // Reset alpha for label
+        ctx.globalAlpha = opacity;
+
+        // Draw button label (arrow symbols or text)
+        ctx.fillStyle = this.constants.MOBILE_COLOR_TEXT;
+        ctx.font = 'bold 36px monospace';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(
+            button.label,
+            button.x + button.width / 2,
+            button.y + button.height / 2
+        );
+
+        // Draw scanline overlay if enabled
+        if (this.constants.MOBILE_SCANLINE_ENABLED) {
+            this.renderScanlines(ctx, button);
+        }
+
+        // Restore context state
+        ctx.restore();
+    }
+
+    /**
+     * Render glow effect around button
+     * @param {CanvasRenderingContext2D} ctx - Canvas rendering context
+     * @param {Object} button - Button definition object
+     */
+    renderGlowEffect(ctx, button) {
+        // Create glow effect using shadowBlur
+        ctx.shadowColor = button.borderColor;
+        ctx.shadowBlur = this.constants.MOBILE_GLOW_BLUR;
+        ctx.shadowOffsetX = 0;
+        ctx.shadowOffsetY = 0;
+
+        // Draw a rectangle to trigger the glow
+        ctx.fillStyle = button.borderColor;
+        ctx.globalAlpha = 0.3;
+        ctx.fillRect(button.x, button.y, button.width, button.height);
+
+        // Reset shadow for subsequent drawing
+        ctx.shadowBlur = 0;
+        ctx.globalAlpha = this.isButtonPressed(button.type) ?
+            this.constants.MOBILE_BUTTON_OPACITY_PRESSED :
+            this.constants.MOBILE_BUTTON_OPACITY;
+    }
+
+    /**
+     * Render scanline overlay on button
+     * @param {CanvasRenderingContext2D} ctx - Canvas rendering context
+     * @param {Object} button - Button definition object
+     */
+    renderScanlines(ctx, button) {
+        const spacing = this.constants.MOBILE_SCANLINE_SPACING;
+        const opacity = this.constants.MOBILE_SCANLINE_OPACITY;
+
+        ctx.globalAlpha = opacity;
+        ctx.strokeStyle = '#000000';
+        ctx.lineWidth = 1;
+
+        // Draw horizontal scanlines
+        for (let y = button.y; y < button.y + button.height; y += spacing) {
+            ctx.beginPath();
+            ctx.moveTo(button.x, y);
+            ctx.lineTo(button.x + button.width, y);
+            ctx.stroke();
         }
     }
 

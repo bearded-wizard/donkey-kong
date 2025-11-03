@@ -287,19 +287,54 @@ const Constants = {
     MOBILE_TOUCH_DEAD_ZONE: 10,
 
     /**
-     * D-pad button color (matches retro platform red)
+     * D-pad button background color (dark retro fill)
      */
-    MOBILE_COLOR_DPAD: '#FF0000',
+    MOBILE_COLOR_DPAD_BG: '#1a1a1a',
 
     /**
-     * Jump button color (matches retro player yellow)
+     * D-pad button border color (bright red)
      */
-    MOBILE_COLOR_JUMP: '#FFFF00',
+    MOBILE_COLOR_DPAD_BORDER: '#ff0000',
 
     /**
-     * Mobile button border color for visibility
+     * Jump button background color (dark retro fill)
      */
-    MOBILE_COLOR_BORDER: '#FFFFFF',
+    MOBILE_COLOR_JUMP_BG: '#1a1a1a',
+
+    /**
+     * Jump button border color (bright yellow)
+     */
+    MOBILE_COLOR_JUMP_BORDER: '#ffff00',
+
+    /**
+     * Mobile button text/symbol color
+     */
+    MOBILE_COLOR_TEXT: '#ffffff',
+
+    /**
+     * Enable glow effect on mobile buttons
+     */
+    MOBILE_GLOW_ENABLED: true,
+
+    /**
+     * Glow blur radius in pixels
+     */
+    MOBILE_GLOW_BLUR: 10,
+
+    /**
+     * Enable scanline overlay on mobile buttons
+     */
+    MOBILE_SCANLINE_ENABLED: true,
+
+    /**
+     * Scanline spacing in pixels
+     */
+    MOBILE_SCANLINE_SPACING: 4,
+
+    /**
+     * Scanline opacity
+     */
+    MOBILE_SCANLINE_OPACITY: 0.3,
 
     /**
      * Enable haptic feedback on mobile devices
