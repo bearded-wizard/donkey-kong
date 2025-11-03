@@ -157,4 +157,40 @@ class InputHandler {
         window.removeEventListener('keyup', this.handleKeyUp);
         window.removeEventListener('blur', this.handleBlur);
     }
+
+    /**
+     * Detect if the current device is a mobile or touch-enabled device
+     *
+     * Uses multiple detection methods for reliable mobile/tablet detection:
+     * 1. Touch support: Checks for 'ontouchstart' in window
+     * 2. Touch points: Checks navigator.maxTouchPoints > 0
+     * 3. Screen width: Checks if width <= MOBILE_BREAKPOINT (768px)
+     *
+     * Returns true if ANY of these conditions are met, ensuring:
+     * - Mobile phones are detected (touch + narrow screen)
+     * - Tablets are detected (touch + wide screen)
+     * - Desktop touch screens are detected (touch on wide screen)
+     * - Desktops without touch return false (no touch + wide screen)
+     *
+     * @returns {boolean} True if device should display mobile controls
+     *
+     * @example
+     * // Check before rendering touch controls
+     * if (InputHandler.isMobileDevice()) {
+     *     renderTouchControls();
+     * }
+     */
+    static isMobileDevice() {
+        // Check for touch event support
+        const hasTouchSupport = 'ontouchstart' in window;
+
+        // Check for touch points (more reliable on modern devices)
+        const hasTouchPoints = navigator.maxTouchPoints > 0;
+
+        // Check screen width against mobile breakpoint
+        const isNarrowScreen = window.matchMedia(`(max-width: ${Constants.MOBILE_BREAKPOINT}px)`).matches;
+
+        // Return true if ANY mobile indicator is present
+        return hasTouchSupport || hasTouchPoints || isNarrowScreen;
+    }
 }

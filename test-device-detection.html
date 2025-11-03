@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Device Detection Tests - InputHandler</title>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            background: #1a1a1a;
+            color: #00ff00;
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        h1 {
+            color: #ffff00;
+            border-bottom: 2px solid #ffff00;
+            padding-bottom: 10px;
+        }
+        .test-suite {
+            margin: 20px 0;
+            border: 1px solid #444;
+            padding: 15px;
+            background: #0a0a0a;
+        }
+        .test-case {
+            margin: 10px 0;
+            padding: 10px;
+            border-left: 3px solid #666;
+        }
+        .test-case.pass {
+            border-left-color: #00ff00;
+            background: #001a00;
+        }
+        .test-case.fail {
+            border-left-color: #ff0000;
+            background: #1a0000;
+        }
+        .summary {
+            margin-top: 30px;
+            padding: 20px;
+            background: #0a0a0a;
+            border: 2px solid #ffff00;
+        }
+        .pass-count {
+            color: #00ff00;
+        }
+        .fail-count {
+            color: #ff0000;
+        }
+        .device-info {
+            margin: 20px 0;
+            padding: 15px;
+            background: #0a0a0a;
+            border: 1px solid #444;
+        }
+        .info-item {
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>Device Detection Unit Tests</h1>
+
+    <div class="device-info">
+        <h2>Current Device Information:</h2>
+        <div id="device-info"></div>
+    </div>
+
+    <div id="test-results"></div>
+    <div id="summary" class="summary"></div>
+
+    <!-- Load InputHandler -->
+    <script src="js/utils/Constants.js"></script>
+    <script src="js/systems/InputHandler.js"></script>
+
+    <script>
+        // Simple test framework
+        class TestRunner {
+            constructor() {
+                this.tests = [];
+                this.results = [];
+            }
+
+            test(description, fn) {
+                this.tests.push({ description, fn });
+            }
+
+            run() {
+                this.results = [];
+
+                for (const test of this.tests) {
+                    try {
+                        test.fn();
+                        this.results.push({
+                            description: test.description,
+                            passed: true,
+                            error: null
+                        });
+                    } catch (error) {
+                        this.results.push({
+                            description: test.description,
+                            passed: false,
+                            error: error.message
+                        });
+                    }
+                }
+
+                this.displayResults();
+            }
+
+            displayResults() {
+                const resultsDiv = document.getElementById('test-results');
+                const summaryDiv = document.getElementById('summary');
+
+                // Group tests by suite
+                const suites = {};
+                this.results.forEach(result => {
+                    const suiteName = result.description.split(' - ')[0];
+                    if (!suites[suiteName]) {
+                        suites[suiteName] = [];
+                    }
+                    suites[suiteName].push(result);
+                });
+
+                // Render test suites
+                let html = '';
+                for (const [suiteName, tests] of Object.entries(suites)) {
+                    html += `<div class="test-suite">
+                        <h3>${suiteName}</h3>`;
+
+                    tests.forEach(result => {
+                        const status = result.passed ? 'pass' : 'fail';
+                        const icon = result.passed ? '✓' : '✗';
+                        const errorMsg = result.error ? `<br><small>Error: ${result.error}</small>` : '';
+
+                        html += `<div class="test-case ${status}">
+                            ${icon} ${result.description}${errorMsg}
+                        </div>`;
+                    });
+
+                    html += '</div>';
+                }
+                resultsDiv.innerHTML = html;
+
+                // Summary
+                const passed = this.results.filter(r => r.passed).length;
+                const failed = this.results.filter(r => !r.passed).length;
+                const total = this.results.length;
+
+                summaryDiv.innerHTML = `
+                    <h2>Test Summary</h2>
+                    <div>Total: ${total}</div>
+                    <div class="pass-count">Passed: ${passed}</div>
+                    <div class="fail-count">Failed: ${failed}</div>
+                    <div>${failed === 0 ? '🎉 All tests passed!' : '❌ Some tests failed'}</div>
+                `;
+            }
+        }
+
+        function assert(condition, message) {
+            if (!condition) {
+                throw new Error(message || 'Assertion failed');
+            }
+        }
+
+        function assertEqual(actual, expected, message) {
+            if (actual !== expected) {
+                throw new Error(message || `Expected ${expected} but got ${actual}`);
+            }
+        }
+
+        function assertType(value, type, message) {
+            if (typeof value !== type) {
+                throw new Error(message || `Expected type ${type} but got ${typeof value}`);
+            }
+        }
+
+        // Display device info
+        function displayDeviceInfo() {
+            const info = document.getElementById('device-info');
+            const hasTouch = 'ontouchstart' in window;
+            const maxTouchPoints = navigator.maxTouchPoints || 0;
+            const screenWidth = window.innerWidth;
+            const isMobile = typeof InputHandler.isMobileDevice === 'function' ?
+                InputHandler.isMobileDevice() : 'Method not implemented yet';
+
+            info.innerHTML = `
+                <div class="info-item"><strong>Screen Width:</strong> ${screenWidth}px</div>
+                <div class="info-item"><strong>Mobile Breakpoint:</strong> ${Constants.MOBILE_BREAKPOINT}px</div>
+                <div class="info-item"><strong>Has Touch Support:</strong> ${hasTouch}</div>
+                <div class="info-item"><strong>Max Touch Points:</strong> ${maxTouchPoints}</div>
+                <div class="info-item"><strong>User Agent:</strong> ${navigator.userAgent}</div>
+                <div class="info-item"><strong>isMobileDevice():</strong> ${isMobile}</div>
+            `;
+        }
+
+        // Run tests
+        const runner = new TestRunner();
+
+        // Test Suite 1: Method Existence
+        runner.test('Method Existence - isMobileDevice should exist as static method', () => {
+            assert(typeof InputHandler.isMobileDevice === 'function',
+                'isMobileDevice should be a static method on InputHandler');
+        });
+
+        // Test Suite 2: Return Type
+        runner.test('Return Type - isMobileDevice should return boolean', () => {
+            const result = InputHandler.isMobileDevice();
+            assertType(result, 'boolean', 'isMobileDevice should return a boolean value');
+        });
+
+        // Test Suite 3: Touch Detection
+        runner.test('Touch Detection - should detect touch support', () => {
+            // This test will verify the method checks for touch support
+            // We can't easily mock window properties, but we can verify behavior
+            const result = InputHandler.isMobileDevice();
+            const hasTouch = 'ontouchstart' in window;
+            const maxTouchPoints = navigator.maxTouchPoints || 0;
+            const screenWidth = window.innerWidth;
+
+            // If device has touch AND (multiple touch points OR narrow screen), should return true
+            if (hasTouch && (maxTouchPoints > 0 || screenWidth <= Constants.MOBILE_BREAKPOINT)) {
+                assertEqual(result, true, 'Should return true for touch-enabled mobile device');
+            }
+        });
+
+        // Test Suite 4: Screen Width Detection
+        runner.test('Screen Width Detection - should check against MOBILE_BREAKPOINT', () => {
+            // Verify the constant is being used
+            assert(Constants.MOBILE_BREAKPOINT === 768,
+                'MOBILE_BREAKPOINT constant should be 768');
+
+            // If screen is narrow (<=768px), should likely return true
+            const screenWidth = window.innerWidth;
+            const result = InputHandler.isMobileDevice();
+
+            if (screenWidth <= Constants.MOBILE_BREAKPOINT) {
+                // On narrow screens, method should return true
+                assertEqual(result, true,
+                    `Should return true for screen width ${screenWidth}px (<= ${Constants.MOBILE_BREAKPOINT}px)`);
+            }
+        });
+
+        // Test Suite 5: Desktop Detection
+        runner.test('Desktop Detection - should return false on desktop', () => {
+            const hasTouch = 'ontouchstart' in window;
+            const maxTouchPoints = navigator.maxTouchPoints || 0;
+            const screenWidth = window.innerWidth;
+            const result = InputHandler.isMobileDevice();
+
+            // If no touch support AND wide screen, should return false
+            if (!hasTouch && maxTouchPoints === 0 && screenWidth > Constants.MOBILE_BREAKPOINT) {
+                assertEqual(result, false,
+                    'Should return false for desktop without touch support and wide screen');
+            }
+        });
+
+        // Test Suite 6: maxTouchPoints Detection
+        runner.test('maxTouchPoints Detection - should check navigator.maxTouchPoints', () => {
+            const maxTouchPoints = navigator.maxTouchPoints || 0;
+            const result = InputHandler.isMobileDevice();
+
+            // If device has multiple touch points, should return true
+            if (maxTouchPoints > 1) {
+                assertEqual(result, true,
+                    `Should return true for device with ${maxTouchPoints} touch points`);
+            }
+        });
+
+        // Test Suite 7: Tablet Detection
+        runner.test('Tablet Detection - should detect tablets (touch + wide screen)', () => {
+            const hasTouch = 'ontouchstart' in window;
+            const maxTouchPoints = navigator.maxTouchPoints || 0;
+            const screenWidth = window.innerWidth;
+            const result = InputHandler.isMobileDevice();
+
+            // Tablets: touch support + wide screen
+            if ((hasTouch || maxTouchPoints > 0) && screenWidth > Constants.MOBILE_BREAKPOINT) {
+                assertEqual(result, true,
+                    'Should return true for tablets (touch support with wide screen)');
+            }
+        });
+
+        // Test Suite 8: Logic Combination
+        runner.test('Logic Combination - should use OR logic for all conditions', () => {
+            // The method should return true if ANY of these conditions are met:
+            // 1. Has touch support ('ontouchstart' in window)
+            // 2. Has touch points (maxTouchPoints > 0)
+            // 3. Narrow screen (width <= MOBILE_BREAKPOINT)
+
+            const result = InputHandler.isMobileDevice();
+            const hasTouch = 'ontouchstart' in window;
+            const maxTouchPoints = navigator.maxTouchPoints || 0;
+            const screenWidth = window.innerWidth;
+
+            const expectedResult = hasTouch || maxTouchPoints > 0 ||
+                                  screenWidth <= Constants.MOBILE_BREAKPOINT;
+
+            assertEqual(result, expectedResult,
+                'Should return true if ANY mobile indicator is present (OR logic)');
+        });
+
+        // Run all tests
+        displayDeviceInfo();
+        runner.run();
+
+        // Auto-refresh device info on resize
+        window.addEventListener('resize', () => {
+            displayDeviceInfo();
+            // Re-run tests on resize to verify breakpoint behavior
+            runner.run();
+        });
+    </script>
+</body>
+</html>
