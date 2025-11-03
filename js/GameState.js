@@ -706,4 +706,13 @@ class GameState {
         // Place one hammer on platform 2 (middle of level)
         this.hammers.push(new Hammer(500, Constants.PLATFORM_2 - 40));
     }
+
+    /**
+     * Show tutorial overlay again (for "Show Tutorial Again" in settings) (issue #155)
+     */
+    showTutorialAgain() {
+        if (this.mobileControls) {
+            this.mobileControls.showTutorialAgain();
+        }
+    }
 }

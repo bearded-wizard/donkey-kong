@@ -5,6 +5,100 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.62.0] - 2025-11-03
+
+### Added
+- **First-time mobile tutorial overlay** (issue #155)
+  - Interactive onboarding experience for first-time mobile users
+  - Automatic detection of first mobile visit via localStorage flag ('barrelBlasterTutorialShown')
+  - Semi-transparent dark overlay (85% opacity) to focus attention on tutorial
+  - Pulsing cyan highlights around D-pad and jump button control areas
+  - Smooth sine wave animation for highlight pulse (1.5s cycle, 0.65 to 1.0 opacity)
+  - Brief instruction text above each control area ("Tap here to move", "Tap to jump")
+  - Yellow "Got it!" dismiss button with retro arcade styling
+  - Touch detection and handling for dismiss button
+  - Persistent localStorage flag prevents re-showing after dismissal
+  - Optional "Show Tutorial Again" functionality for settings integration
+  - Graceful error handling when localStorage unavailable
+  - MobileTutorialOverlay class in `js/systems/MobileTutorialOverlay.js`
+- **Tutorial overlay constants** in Constants.js
+  - `TUTORIAL_STORAGE_KEY`: localStorage key for tracking tutorial state
+  - `TUTORIAL_OVERLAY_BG`: semi-transparent overlay background color
+  - `TUTORIAL_HIGHLIGHT_COLOR`: cyan (#00ffff) for pulsing highlights
+  - `TUTORIAL_PULSE_DURATION`: 1500ms animation cycle duration
+  - `TUTORIAL_TEXT_COLOR`: white text for readability
+  - `TUTORIAL_TEXT_SIZE`: 20px font size for mobile readability
+  - `TUTORIAL_BUTTON_BG`: yellow (#ffff00) dismiss button background
+  - `TUTORIAL_BUTTON_TEXT`: black text on yellow button
+  - `TUTORIAL_BUTTON_WIDTH`: 200px button width
+  - `TUTORIAL_BUTTON_HEIGHT`: 60px button height
+  - `TUTORIAL_BUTTON_BORDER`: 3px border width
+
+### Changed
+- **MobileControls integration** with tutorial overlay
+  - Constructor initializes tutorial overlay for mobile devices
+  - `initializeTutorial()` method creates MobileTutorialOverlay instance
+  - Touch event handlers delegate to tutorial when overlay is showing
+  - `update()` method animates tutorial overlay
+  - `render()` method renders tutorial on top of controls
+  - `showTutorialAgain()` method exposes tutorial reset for settings
+  - Touch input blocked during tutorial to prevent accidental gameplay
+- **GameState integration** with tutorial
+  - `showTutorialAgain()` method added for settings integration
+  - Method delegates to MobileControls for tutorial reset
+- **index.html script loading order**
+  - Added `js/systems/MobileTutorialOverlay.js` before MobileControls.js
+  - Ensures proper dependency loading order
+
+### Technical Details
+- **Tutorial lifecycle**
+  - Shown automatically on first mobile visit (InputHandler.isMobileDevice() check)
+  - Dismissed by tapping "Got it!" button
+  - Never shown again unless localStorage flag cleared
+  - Can be manually re-triggered via settings
+- **Animation system**
+  - Sine wave pulse: `0.65 + 0.35 * Math.sin(progress * Math.PI * 2)`
+  - Update loop increments pulseTimer using deltaTime for frame-independent animation
+  - Highlight opacity smoothly transitions between 65% and 100%
+- **Touch handling**
+  - Touch coordinates converted from screen space to canvas space with scaling
+  - Button hit detection using AABB collision check
+  - Touch identifier tracking prevents cross-touch confusion
+  - Early return in MobileControls blocks game input during tutorial
+- **Highlight positioning**
+  - D-pad highlight calculates bounding box of all four direction buttons
+  - Jump button highlight positioned around single jump button
+  - 20px padding around control areas for visual breathing room
+  - Text positioned above highlights with 10px margin
+- **Retro aesthetic**
+  - Cyan highlights match ladder color from game palette
+  - Yellow button matches player/jump button colors
+  - Monospace font consistent with game UI
+  - Glow effects and shadows for arcade feel
+- **Error handling**
+  - Try-catch blocks around all localStorage operations
+  - Falls back to not showing tutorial if localStorage disabled
+  - Console warnings for localStorage errors, no thrown exceptions
+  - Tutorial works in-memory when localStorage unavailable
+- **Integration points**
+  - Ready for SettingsPanel "Show Tutorial Again" button
+  - Method exposed through GameState for centralized access
+  - No breaking changes to existing mobile controls functionality
+
+### Performance
+- O(1) time complexity for all tutorial operations
+- Minimal memory footprint (pulse timer, button bounds)
+- Efficient sine wave calculation using single Math.sin() call
+- No unnecessary canvas operations or redraws
+- Touch handling only active when tutorial showing
+
+### Documentation
+- Comprehensive JSDoc for MobileTutorialOverlay class
+- All public methods documented with parameters and return types
+- Inline comments explaining animation logic and touch handling
+- Constants fully documented with purpose and units
+- Issue #155 references throughout code
+
 ## [0.58.0] - 2025-11-03
 
 ### Added
