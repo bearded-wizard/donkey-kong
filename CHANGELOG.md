@@ -5,6 +5,52 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.50.0] - 2025-11-03
+
+### Added
+- **Device detection utility in InputHandler** (issue #143)
+  - `isMobileDevice()` static method for mobile/touch device detection
+  - Triple detection strategy for maximum reliability:
+    - Touch support check: `'ontouchstart' in window`
+    - Touch points check: `navigator.maxTouchPoints > 0`
+    - Screen width check: `window.matchMedia()` against `MOBILE_BREAKPOINT` (768px)
+  - Returns `true` if ANY detection method indicates mobile/tablet device
+  - Returns `false` only when all checks indicate desktop (no touch + wide screen)
+  - Uses OR logic to ensure comprehensive device detection
+- **Cross-platform device detection**
+  - Accurately detects mobile phones (touch + narrow screen)
+  - Accurately detects tablets (touch + wide screen)
+  - Detects desktop touch screens (touch + wide screen)
+  - Returns false for traditional desktops (no touch + wide screen)
+- **Comprehensive test suite** (`test-device-detection.html`)
+  - 8 automated test cases covering all detection scenarios
+  - Device information display (screen width, touch support, touch points)
+  - Real-time test execution with pass/fail reporting
+  - Responsive test re-execution on window resize
+- **Integration verification** (`verify-integration.html`)
+  - Step-by-step integration verification workflow
+  - Browser API compatibility checks
+  - Example usage demonstrations
+  - Interactive testing buttons
+
+### Technical Details
+- Static method implementation (no instantiation required)
+- Uses modern `window.matchMedia()` API for responsive width detection
+- References `Constants.MOBILE_BREAKPOINT` (768px) instead of hardcoded values
+- Comprehensive JSDoc documentation with usage examples
+- O(1) time complexity - three simple boolean checks
+- O(1) space complexity - three local boolean variables
+- Cross-browser compatible (uses standard Web APIs)
+- No external dependencies - pure vanilla JavaScript
+- Defensive programming: handles missing `maxTouchPoints` property gracefully
+- Ready for integration with touch control rendering logic
+
+### Documentation
+- JSDoc comments explain detection strategy and use cases
+- Code example provided in documentation
+- Test files demonstrate proper usage patterns
+- Acceptance criteria from issue #143 fully met
+
 ## [0.49.0] - 2025-11-03
 
 ### Added
