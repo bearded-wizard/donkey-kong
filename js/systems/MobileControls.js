@@ -28,6 +28,9 @@ class MobileControls {
         this.constants = constants;
         this.settingsManager = settingsManager;
 
+        // Tutorial overlay (issue #155)
+        this.tutorialOverlay = null;
+
         // Track active touches by touch ID
         this.activeTouches = new Map();
 
@@ -56,6 +59,19 @@ class MobileControls {
 
         // Setup touch event listeners on canvas
         this.setupTouchListeners();
+
+        // Initialize tutorial overlay for first-time mobile users (issue #155)
+        this.initializeTutorial();
+    }
+
+    /**
+     * Initialize tutorial overlay for first-time mobile users (issue #155)
+     */
+    initializeTutorial() {
+        // Only show tutorial on mobile devices
+        if (InputHandler.isMobileDevice()) {
+            this.tutorialOverlay = new MobileTutorialOverlay(this.constants, this);
+        }
     }
 
     /**
@@ -171,6 +187,12 @@ class MobileControls {
     handleTouchStart(event) {
         event.preventDefault();
 
+        // If tutorial is showing, delegate touch to tutorial (issue #155)
+        if (this.tutorialOverlay && this.tutorialOverlay.isShowing()) {
+            this.tutorialOverlay.handleTouchStart(event, this.canvas);
+            return;
+        }
+
         // Get canvas bounds for coordinate conversion
         const rect = this.canvas.getBoundingClientRect();
         const scaleX = this.constants.CANVAS_WIDTH / rect.width;
@@ -273,6 +295,12 @@ class MobileControls {
     handleTouchEnd(event) {
         event.preventDefault();
 
+        // If tutorial is showing, delegate touch to tutorial (issue #155)
+        if (this.tutorialOverlay && this.tutorialOverlay.isShowing()) {
+            this.tutorialOverlay.handleTouchEnd(event);
+            return;
+        }
+
         // Process each ended touch
         for (let i = 0; i < event.changedTouches.length; i++) {
             const touch = event.changedTouches[i];
@@ -339,6 +367,11 @@ class MobileControls {
      * @param {number} deltaTime - Time elapsed since last frame in seconds
      */
     update(deltaTime) {
+        // Update tutorial overlay animation (issue #155)
+        if (this.tutorialOverlay) {
+            this.tutorialOverlay.update(deltaTime);
+        }
+
         // Update animation states for all buttons
         for (const button of this.buttons) {
             const state = this.buttonStates.get(button.type);
@@ -427,6 +460,20 @@ class MobileControls {
         // Render each button with retro pixel-art styling
         for (const button of this.buttons) {
             this.renderButton(ctx, button);
+        }
+
+        // Render tutorial overlay on top if showing (issue #155)
+        if (this.tutorialOverlay) {
+            this.tutorialOverlay.render(ctx);
+        }
+    }
+
+    /**
+     * Show tutorial overlay again (for "Show Tutorial Again" in settings) (issue #155)
+     */
+    showTutorialAgain() {
+        if (this.tutorialOverlay) {
+            this.tutorialOverlay.reset();
         }
     }
 

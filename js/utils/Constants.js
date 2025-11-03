@@ -403,6 +403,73 @@ const Constants = {
      * Options: 'linear', 'easeInOut', 'easeOut', 'easeIn'
      */
     MOBILE_TRANSITION_EASING: 'easeOut',
+
+    // ===========================
+    // MOBILE TUTORIAL OVERLAY CONSTANTS
+    // ===========================
+
+    /**
+     * LocalStorage key for tutorial shown flag
+     * Used to track if first-time mobile tutorial has been displayed
+     */
+    TUTORIAL_STORAGE_KEY: 'barrelBlasterTutorialShown',
+
+    /**
+     * Tutorial overlay background color with opacity
+     * Semi-transparent dark overlay to focus attention on tutorial
+     */
+    TUTORIAL_OVERLAY_BG: 'rgba(0, 0, 0, 0.85)',
+
+    /**
+     * Tutorial highlight pulse animation color
+     * Bright cyan glow to draw attention to control areas
+     */
+    TUTORIAL_HIGHLIGHT_COLOR: '#00ffff',
+
+    /**
+     * Tutorial highlight pulse animation duration in milliseconds
+     * Controls the speed of the pulsing glow effect
+     */
+    TUTORIAL_PULSE_DURATION: 1500,
+
+    /**
+     * Tutorial text color
+     * Bright white for maximum readability on dark background
+     */
+    TUTORIAL_TEXT_COLOR: '#ffffff',
+
+    /**
+     * Tutorial text font size in pixels
+     * Large enough for mobile readability
+     */
+    TUTORIAL_TEXT_SIZE: 20,
+
+    /**
+     * Tutorial dismiss button background color
+     * Yellow to match retro arcade aesthetic
+     */
+    TUTORIAL_BUTTON_BG: '#ffff00',
+
+    /**
+     * Tutorial dismiss button text color
+     * Black for strong contrast on yellow background
+     */
+    TUTORIAL_BUTTON_TEXT: '#000000',
+
+    /**
+     * Tutorial dismiss button width in pixels
+     */
+    TUTORIAL_BUTTON_WIDTH: 200,
+
+    /**
+     * Tutorial dismiss button height in pixels
+     */
+    TUTORIAL_BUTTON_HEIGHT: 60,
+
+    /**
+     * Tutorial dismiss button border width in pixels
+     */
+    TUTORIAL_BUTTON_BORDER: 3,
 };
 
 // Freeze the object to prevent modifications
