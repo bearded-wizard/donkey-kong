@@ -32,6 +32,11 @@ class MobileControls {
         // Button definitions array (positions, sizes, types)
         this.buttons = this.initializeButtonDefinitions();
 
+        // Track button animation state for smooth transitions
+        // Maps button type to animation state object
+        this.buttonStates = new Map();
+        this.initializeButtonStates();
+
         // Bind event handlers to maintain 'this' context
         this.handleTouchStart = this.handleTouchStart.bind(this);
         this.handleTouchMove = this.handleTouchMove.bind(this);
@@ -119,6 +124,24 @@ class MobileControls {
     }
 
     /**
+     * Initialize button animation states
+     * Creates state tracking objects for smooth transitions
+     */
+    initializeButtonStates() {
+        for (const button of this.buttons) {
+            this.buttonStates.set(button.type, {
+                isPressed: false,
+                currentScale: this.constants.MOBILE_BUTTON_SCALE_NORMAL,
+                currentOpacity: this.constants.MOBILE_BUTTON_OPACITY,
+                currentGlowBlur: this.constants.MOBILE_GLOW_BLUR,
+                transitionProgress: 0, // 0 = normal, 1 = fully pressed
+                lastPressTime: 0,
+                needsRedraw: true // Flag to optimize rendering
+            });
+        }
+    }
+
+    /**
      * Setup touch event listeners on canvas
      */
     setupTouchListeners() {
@@ -155,6 +178,14 @@ class MobileControls {
             if (button) {
                 // Store active touch
                 this.activeTouches.set(touch.identifier, button.type);
+
+                // Update button state for animation
+                const state = this.buttonStates.get(button.type);
+                if (state && !state.isPressed) {
+                    state.isPressed = true;
+                    state.lastPressTime = Date.now();
+                    state.needsRedraw = true;
+                }
 
                 // Update input handler
                 this.inputHandler.setTouchButton(button.type, true);
@@ -197,12 +228,27 @@ class MobileControls {
                 if (currentButton) {
                     this.inputHandler.setTouchButton(currentButton, false);
                     this.activeTouches.delete(touch.identifier);
+
+                    // Update button state
+                    const oldState = this.buttonStates.get(currentButton);
+                    if (oldState) {
+                        oldState.isPressed = false;
+                        oldState.needsRedraw = true;
+                    }
                 }
 
                 // Press the new button
                 if (newButton) {
                     this.activeTouches.set(touch.identifier, newButton.type);
                     this.inputHandler.setTouchButton(newButton.type, true);
+
+                    // Update button state
+                    const newState = this.buttonStates.get(newButton.type);
+                    if (newState) {
+                        newState.isPressed = true;
+                        newState.lastPressTime = Date.now();
+                        newState.needsRedraw = true;
+                    }
                 }
             }
         }
@@ -223,6 +269,13 @@ class MobileControls {
             if (button) {
                 // Release button in input handler
                 this.inputHandler.setTouchButton(button, false);
+
+                // Update button state
+                const state = this.buttonStates.get(button);
+                if (state) {
+                    state.isPressed = false;
+                    state.needsRedraw = true;
+                }
 
                 // Remove from active touches
                 this.activeTouches.delete(touch.identifier);
@@ -270,12 +323,82 @@ class MobileControls {
 
     /**
      * Update method (lifecycle)
-     * Currently no per-frame updates needed, but required for consistency
+     * Handles smooth transitions for button animations
      * @param {number} deltaTime - Time elapsed since last frame in seconds
      */
     update(deltaTime) {
-        // No per-frame updates needed for mobile controls
-        // This method exists for consistency with other game systems
+        // Update animation states for all buttons
+        for (const button of this.buttons) {
+            const state = this.buttonStates.get(button.type);
+            if (!state) continue;
+
+            // Calculate target values based on press state
+            const targetScale = state.isPressed ?
+                this.constants.MOBILE_BUTTON_SCALE_PRESSED :
+                this.constants.MOBILE_BUTTON_SCALE_NORMAL;
+
+            const targetOpacity = state.isPressed ?
+                this.constants.MOBILE_BUTTON_OPACITY_PRESSED :
+                this.constants.MOBILE_BUTTON_OPACITY;
+
+            const targetGlowBlur = state.isPressed ?
+                this.constants.MOBILE_GLOW_BLUR_PRESSED :
+                this.constants.MOBILE_GLOW_BLUR;
+
+            // Calculate transition progress (0 to 1)
+            const transitionSpeed = deltaTime / (this.constants.MOBILE_TRANSITION_DURATION / 1000);
+            const easedProgress = this.easeOut(Math.min(transitionSpeed, 1));
+
+            // Smoothly interpolate current values toward targets
+            const prevScale = state.currentScale;
+            const prevOpacity = state.currentOpacity;
+            const prevGlowBlur = state.currentGlowBlur;
+
+            state.currentScale = this.lerp(state.currentScale, targetScale, easedProgress);
+            state.currentOpacity = this.lerp(state.currentOpacity, targetOpacity, easedProgress);
+            state.currentGlowBlur = this.lerp(state.currentGlowBlur, targetGlowBlur, easedProgress);
+
+            // Check if values changed (optimization: only redraw if necessary)
+            const hasChanged =
+                Math.abs(prevScale - state.currentScale) > 0.001 ||
+                Math.abs(prevOpacity - state.currentOpacity) > 0.001 ||
+                Math.abs(prevGlowBlur - state.currentGlowBlur) > 0.1;
+
+            if (hasChanged) {
+                state.needsRedraw = true;
+            } else {
+                // Snap to target when very close (prevent endless tiny updates)
+                if (Math.abs(state.currentScale - targetScale) < 0.001) {
+                    state.currentScale = targetScale;
+                }
+                if (Math.abs(state.currentOpacity - targetOpacity) < 0.001) {
+                    state.currentOpacity = targetOpacity;
+                }
+                if (Math.abs(state.currentGlowBlur - targetGlowBlur) < 0.1) {
+                    state.currentGlowBlur = targetGlowBlur;
+                }
+            }
+        }
+    }
+
+    /**
+     * Linear interpolation helper
+     * @param {number} start - Start value
+     * @param {number} end - End value
+     * @param {number} t - Progress (0 to 1)
+     * @returns {number} Interpolated value
+     */
+    lerp(start, end, t) {
+        return start + (end - start) * t;
+    }
+
+    /**
+     * Ease-out easing function (fast start, slow end)
+     * @param {number} t - Progress (0 to 1)
+     * @returns {number} Eased value (0 to 1)
+     */
+    easeOut(t) {
+        return 1 - Math.pow(1 - t, 3);
     }
 
     /**
@@ -301,27 +424,46 @@ class MobileControls {
      * @param {Object} button - Button definition object
      */
     renderButton(ctx, button) {
-        // Check if button is currently pressed
-        const isPressed = this.isButtonPressed(button.type);
+        // Get button animation state
+        const state = this.buttonStates.get(button.type);
+        if (!state) return;
 
-        // Calculate opacity based on press state
-        const opacity = isPressed ?
-            this.constants.MOBILE_BUTTON_OPACITY_PRESSED :
-            this.constants.MOBILE_BUTTON_OPACITY;
+        // Reset redraw flag (always render, but flag tracks if update needed)
+        state.needsRedraw = false;
+
+        // Check if button is currently pressed
+        const isPressed = state.isPressed;
+
+        // Use animated values from state
+        const opacity = state.currentOpacity;
+        const scale = state.currentScale;
+        const glowBlur = state.currentGlowBlur;
 
         // Save context state
         ctx.save();
+
+        // Apply scale transformation (centered on button)
+        const centerX = button.x + button.width / 2;
+        const centerY = button.y + button.height / 2;
+        ctx.translate(centerX, centerY);
+        ctx.scale(scale, scale);
+        ctx.translate(-centerX, -centerY);
 
         // Set opacity
         ctx.globalAlpha = opacity;
 
         // Draw glow effect if enabled
         if (this.constants.MOBILE_GLOW_ENABLED) {
-            this.renderGlowEffect(ctx, button);
+            this.renderGlowEffect(ctx, button, glowBlur);
         }
 
-        // Draw button background (dark fill)
-        ctx.fillStyle = button.bgColor;
+        // Draw button background with color shift for pressed state
+        const bgColor = isPressed ?
+            (button.type === 'jump' ?
+                this.constants.MOBILE_COLOR_JUMP_BG_PRESSED :
+                this.constants.MOBILE_COLOR_DPAD_BG_PRESSED) :
+            button.bgColor;
+        ctx.fillStyle = bgColor;
         ctx.fillRect(button.x, button.y, button.width, button.height);
 
         // Draw button border (bright red/yellow)
@@ -369,11 +511,12 @@ class MobileControls {
      * Render glow effect around button
      * @param {CanvasRenderingContext2D} ctx - Canvas rendering context
      * @param {Object} button - Button definition object
+     * @param {number} glowBlur - Animated glow blur radius
      */
-    renderGlowEffect(ctx, button) {
-        // Create glow effect using shadowBlur
+    renderGlowEffect(ctx, button, glowBlur) {
+        // Create glow effect using shadowBlur (animated)
         ctx.shadowColor = button.borderColor;
-        ctx.shadowBlur = this.constants.MOBILE_GLOW_BLUR;
+        ctx.shadowBlur = glowBlur;
         ctx.shadowOffsetX = 0;
         ctx.shadowOffsetY = 0;
 
@@ -384,9 +527,10 @@ class MobileControls {
 
         // Reset shadow for subsequent drawing
         ctx.shadowBlur = 0;
-        ctx.globalAlpha = this.isButtonPressed(button.type) ?
-            this.constants.MOBILE_BUTTON_OPACITY_PRESSED :
-            this.constants.MOBILE_BUTTON_OPACITY;
+
+        // Get state for opacity
+        const state = this.buttonStates.get(button.type);
+        ctx.globalAlpha = state ? state.currentOpacity : this.constants.MOBILE_BUTTON_OPACITY;
     }
 
     /**

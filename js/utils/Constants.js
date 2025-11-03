@@ -360,6 +360,48 @@ const Constants = {
      * Devices with width <= this value are considered mobile
      */
     MOBILE_BREAKPOINT: 768,
+
+    /**
+     * Scale factor for buttons in normal state
+     * Default scale (1.0 = 100% size)
+     */
+    MOBILE_BUTTON_SCALE_NORMAL: 1.0,
+
+    /**
+     * Scale factor for buttons when pressed
+     * Slight increase (1.05 = 105% size) provides visual feedback
+     */
+    MOBILE_BUTTON_SCALE_PRESSED: 1.05,
+
+    /**
+     * Glow blur radius for pressed buttons (enhanced glow)
+     * Larger than normal glow to emphasize button press
+     */
+    MOBILE_GLOW_BLUR_PRESSED: 20,
+
+    /**
+     * Background color shift for D-pad buttons when pressed
+     * Brighter shade of dark background
+     */
+    MOBILE_COLOR_DPAD_BG_PRESSED: '#2a2a2a',
+
+    /**
+     * Background color shift for jump button when pressed
+     * Brighter shade of dark background
+     */
+    MOBILE_COLOR_JUMP_BG_PRESSED: '#2a2a2a',
+
+    /**
+     * Transition speed for button animations in milliseconds
+     * Used for smooth scale and color transitions
+     */
+    MOBILE_TRANSITION_DURATION: 150,
+
+    /**
+     * Easing function name for button animations
+     * Options: 'linear', 'easeInOut', 'easeOut', 'easeIn'
+     */
+    MOBILE_TRANSITION_EASING: 'easeOut',
 };
 
 // Freeze the object to prevent modifications
